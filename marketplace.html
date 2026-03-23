@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DormKart Marketplace</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<style>
+
+body{
+font-family:Segoe UI;
+background:#F9FAFB;
+margin:0;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+padding:20px 40px;
+background:white;
+box-shadow:0 3px 10px rgba(0,0,0,0.05);
+}
+
+.add-btn{
+background:#4F46E5;
+color:white;
+border:none;
+padding:10px 16px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.container{
+padding:40px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+
+.card img{
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.price{
+color:#4F46E5;
+font-weight:bold;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+align-items:center;
+justify-content:center;
+}
+
+.modal-content{
+background:white;
+padding:30px;
+border-radius:10px;
+width:300px;
+}
+
+.modal input{
+width:100%;
+margin-bottom:10px;
+padding:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<h2>DormKart Marketplace</h2>
+
+<button class="add-btn" onclick="openModal()">+ Add Item</button>
+
+</div>
+
+<div class="container">
+
+<div id="items" class="grid"></div>
+
+</div>
+
+
+<!-- Add Item Modal -->
+
+<div class="modal" id="modal">
+
+<div class="modal-content">
+
+<h3>Add Item</h3>
+
+<input id="title" placeholder="Item title">
+<input id="price" placeholder="Price">
+<input id="image" placeholder="Image URL">
+
+<button onclick="addItem()">Add</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+const supabaseClient = supabase.createClient(
+SUPABASE_CONFIG.url,
+SUPABASE_CONFIG.key
+)
+
+
+// Protect page
+
+async function checkUser(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(!data.session){
+window.location="index.html"
+}
+
+}
+
+checkUser()
+
+
+// Load items
+
+async function loadItems(){
+
+const { data } = await supabaseClient
+.from("items")
+.select("*")
+
+const container = document.getElementById("items")
+
+container.innerHTML=""
+
+data.forEach(item => {
+
+container.innerHTML += `
+<div class="card">
+<img src="${item.image}">
+<h3>${item.title}</h3>
+<p class="price">$${item.price}</p>
+</div>
+`
+
+})
+
+}
+
+loadItems()
+
+
+// Modal
+
+function openModal(){
+document.getElementById("modal").style.display="flex"
+}
+
+
+// Add item
+
+async function addItem(){
+
+const title = document.getElementById("title").value
+const price = document.getElementById("price").value
+const image = document.getElementById("image").value
+
+await supabaseClient
+.from("items")
+.insert([
+{ title, price, image }
+])
+
+document.getElementById("modal").style.display="none"
+
+loadItems()
+
+}
+
+</script>
+
+</body>
+</html>
