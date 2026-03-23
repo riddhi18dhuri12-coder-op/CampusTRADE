@@ -1,195 +1,199 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<title>DormKart Marketplace</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DormKart Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-
 <style>
 
-body{
-font-family:Segoe UI;
+*{
 margin:0;
-background:#F9FAFB;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
 }
 
-/* HEADER */
+body{
+display:flex;
+height:100vh;
+background:#F0FDFA;
+}
+
+/* Sidebar */
+
+.sidebar{
+width:240px;
+background:#14B8A6;
+color:white;
+padding:30px 20px;
+display:flex;
+flex-direction:column;
+box-shadow:4px 0 20px rgba(0,0,0,0.05);
+}
+
+.sidebar h2{
+margin-bottom:35px;
+font-weight:600;
+letter-spacing:1px;
+}
+
+.sidebar a{
+color:white;
+text-decoration:none;
+margin-bottom:12px;
+padding:12px 14px;
+border-radius:8px;
+display:flex;
+align-items:center;
+gap:10px;
+transition:0.25s;
+}
+
+.sidebar a:hover{
+background:rgba(255,255,255,0.2);
+transform:translateX(4px);
+}
+
+/* Main Section */
+
+.main{
+flex:1;
+padding:40px;
+}
+
+/* Header */
 
 .header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px 40px;
-background:white;
-box-shadow:0 3px 10px rgba(0,0,0,0.05);
+margin-bottom:30px;
 }
 
-.add-btn{
-background:#4F46E5;
+.header h1{
+font-size:28px;
+font-weight:600;
+color:#0F172A;
+}
+
+/* Logout */
+
+.logout{
+background:#EF4444;
 color:white;
 border:none;
-padding:10px 16px;
-border-radius:6px;
+padding:10px 18px;
+border-radius:8px;
 cursor:pointer;
+font-weight:500;
+transition:0.2s;
 }
 
-/* FILTERS */
-
-.filters{
-display:flex;
-gap:15px;
-padding:20px 40px;
+.logout:hover{
+opacity:0.9;
 }
 
-.filters input,select{
-padding:10px;
-border:1px solid #ddd;
-border-radius:6px;
+/* Add Item Button */
+
+.add-btn{
+background:#14B8A6;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:10px;
+cursor:pointer;
+font-weight:500;
+box-shadow:0 5px 15px rgba(20,184,166,0.25);
+transition:0.2s;
 }
 
-/* GRID */
-
-.container{
-padding:0 40px 40px;
+.add-btn:hover{
+background:#0D9488;
 }
 
-.grid{
+/* Cards */
+
+.cards{
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-gap:20px;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:25px;
 }
 
 .card{
 background:white;
-border-radius:10px;
-overflow:hidden;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
+padding:22px;
+border-radius:14px;
+box-shadow:0 10px 25px rgba(0,0,0,0.06);
+transition:0.2s;
 }
 
-.card img{
-width:100%;
-height:150px;
-object-fit:cover;
+.card:hover{
+transform:translateY(-4px);
+box-shadow:0 15px 35px rgba(0,0,0,0.08);
 }
 
-.card-body{
-padding:15px;
-}
-
-.price{
-color:#4F46E5;
-font-weight:bold;
-}
-
-.card button{
-margin-top:8px;
-padding:6px 10px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-}
-
-.save{
-background:#EF4444;
-color:white;
-}
-
-.view{
-background:#4F46E5;
-color:white;
-}
-
-/* MODAL */
-
-.modal{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.5);
-align-items:center;
-justify-content:center;
-}
-
-.modal-box{
-background:white;
-padding:25px;
-border-radius:10px;
-width:320px;
-}
-
-.modal-box input,select{
-width:100%;
-padding:10px;
+.card h3{
 margin-bottom:10px;
-border:1px solid #ddd;
-border-radius:6px;
+font-size:18px;
+color:#0F172A;
+}
+
+.card p{
+color:#64748B;
+font-size:14px;
 }
 
 </style>
-
 </head>
 
 <body>
 
+<div class="sidebar">
+
+<h2>DormKart</h2>
+
+<a href="#">Dashboard</a>
+<a href="#">Marketplace</a>
+<a href="#">My Listings</a>
+<a href="#">Wishlist</a>
+<a href="#">Messages</a>
+
+</div>
+
+
+<div class="main">
 
 <div class="header">
 
-<h2>DormKart Marketplace</h2>
+<h1>Dashboard</h1>
 
-<button class="add-btn" onclick="openModal()">+ Add Item</button>
-
-</div>
-
-
-<div class="filters">
-
-<input id="search" placeholder="Search items..." oninput="loadItems()">
-
-<select id="category" onchange="loadItems()">
-<option value="">All Categories</option>
-<option>Books</option>
-<option>Electronics</option>
-<option>Cycles</option>
-<option>Accessories</option>
-</select>
+<button class="logout" onclick="logout()">Logout</button>
 
 </div>
 
+<button class="add-btn">+ Add Item</button>
 
-<div class="container">
+<br><br>
 
-<div id="items" class="grid"></div>
+<div class="cards">
 
+<div class="card">
+<h3>My Listings</h3>
+<p>View items you are selling.</p>
 </div>
 
+<div class="card">
+<h3>Wishlist</h3>
+<p>Items you saved.</p>
+</div>
 
-<!-- ADD ITEM MODAL -->
-
-<div class="modal" id="modal">
-
-<div class="modal-box">
-
-<h3>Add Item</h3>
-
-<input id="title" placeholder="Item Title">
-
-<input id="price" placeholder="Price">
-
-<select id="cat">
-<option>Books</option>
-<option>Electronics</option>
-<option>Cycles</option>
-<option>Accessories</option>
-</select>
-
-<input type="file" id="imageFile">
-
-<button onclick="addItem()">Add Item</button>
+<div class="card">
+<h3>Messages</h3>
+<p>Chat with buyers and sellers.</p>
+</div>
 
 </div>
 
@@ -203,8 +207,7 @@ SUPABASE_CONFIG.url,
 SUPABASE_CONFIG.key
 )
 
-
-// Protect page
+// Protect dashboard
 
 async function checkUser(){
 
@@ -219,138 +222,13 @@ window.location="index.html"
 checkUser()
 
 
-// LOAD ITEMS
+// Logout
 
-async function loadItems(){
+async function logout(){
 
-const search = document.getElementById("search").value.toLowerCase()
-const category = document.getElementById("category").value
+await supabaseClient.auth.signOut()
 
-const { data } = await supabaseClient
-.from("items")
-.select("*")
-
-const container = document.getElementById("items")
-
-container.innerHTML=""
-
-data
-.filter(item =>
-item.title.toLowerCase().includes(search) &&
-(category=="" || item.category==category)
-)
-.forEach(item => {
-
-container.innerHTML += `
-<div class="card">
-
-<img src="${item.image}">
-
-<div class="card-body">
-
-<h3>${item.title}</h3>
-
-<p class="price">₹${item.price}</p>
-
-<p>${item.category}</p>
-
-<button class="save" onclick="saveItem(${item.id})">
-❤️ Save
-</button>
-
-<button class="view" onclick="viewItem(${item.id})">
-View
-</button>
-
-</div>
-
-</div>
-`
-
-})
-
-}
-
-loadItems()
-
-
-
-// OPEN MODAL
-
-function openModal(){
-document.getElementById("modal").style.display="flex"
-}
-
-
-
-// ADD ITEM WITH IMAGE UPLOAD
-
-async function addItem(){
-
-const title = document.getElementById("title").value
-const price = document.getElementById("price").value
-const category = document.getElementById("cat").value
-
-const file = document.getElementById("imageFile").files[0]
-
-const { data:userData } = await supabaseClient.auth.getUser()
-
-const fileName = Date.now() + "-" + file.name
-
-
-await supabaseClient.storage
-.from("item-images")
-.upload(fileName,file)
-
-
-const { data:imageUrl } = supabaseClient.storage
-.from("item-images")
-.getPublicUrl(fileName)
-
-
-await supabaseClient
-.from("items")
-.insert([{
-title,
-price,
-category,
-image:imageUrl.publicUrl,
-seller_id:userData.user.id
-}])
-
-
-document.getElementById("modal").style.display="none"
-
-loadItems()
-
-}
-
-
-
-// SAVE TO WISHLIST
-
-async function saveItem(itemId){
-
-const { data:userData } = await supabaseClient.auth.getUser()
-
-await supabaseClient
-.from("wishlist")
-.insert([{
-user_id:userData.user.id,
-item_id:itemId
-}])
-
-alert("Saved to wishlist")
-
-}
-
-
-
-// VIEW ITEM PAGE
-
-function viewItem(id){
-
-window.location="item.html?id="+id
+window.location="index.html"
 
 }
 
