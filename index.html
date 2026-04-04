@@ -144,7 +144,6 @@ margin-top:10px;
 
 </div>
 
-
 <!-- SIGNUP -->
 
 <div id="signupForm" class="form">
@@ -164,14 +163,10 @@ margin-top:10px;
 
 <script>
 
-// Supabase connection using config.js
 const supabaseClient = supabase.createClient(
 SUPABASE_CONFIG.url,
 SUPABASE_CONFIG.key
 )
-
-
-// TAB SWITCH
 
 const loginTab = document.getElementById("loginTab")
 const signupTab = document.getElementById("signupTab")
@@ -199,9 +194,6 @@ loginForm.classList.remove("active")
 
 }
 
-
-// SIGNUP
-
 async function signup(){
 
 const email = document.getElementById("signupEmail").value
@@ -217,7 +209,6 @@ if(error){
 document.getElementById("signupMsg").innerText = error.message
 
 }
-
 else{
 
 document.getElementById("signupMsg").style.color="green"
@@ -230,9 +221,6 @@ window.location="dashboard.html"
 }
 
 }
-
-
-// LOGIN
 
 async function login(){
 
@@ -249,7 +237,6 @@ if(error){
 document.getElementById("loginMsg").innerText = error.message
 
 }
-
 else{
 
 document.getElementById("loginMsg").style.color="green"
