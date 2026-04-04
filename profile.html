@@ -10,76 +10,113 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body { background: #F8FAFC; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+/* Refined Color Palette & Variables */
+:root {
+    --primary: #4F46E5; /* Indigo */
+    --primary-light: #EEF2FF;
+    --secondary: #6366F1;
+    --success: #10B981;
+    --danger: #EF4444;
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --bg-body: #F1F5F9;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+body { background: var(--bg-body); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
 
 /* App Bar */
 .app-bar {
-    background: #14B8A6; color: white; padding: 16px 20px;
+    background: var(--primary); color: white; padding: 16px 20px;
     display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
 }
-.app-bar h1 { font-size: 20px; font-weight: 500; }
+.app-bar h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
 .icon-btn { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; }
 
 /* Profile Header Widget */
 .profile-header {
-    background: white; padding: 30px 20px; text-align: center;
-    border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;
+    background: white; padding: 25px 20px; text-align: center;
+    border-bottom: 1px solid #E2E8F0;
 }
 .avatar {
-    width: 80px; height: 80px; border-radius: 50%; background: #E6FFFA; color: #14B8A6;
+    width: 85px; height: 85px; border-radius: 50%; background: var(--primary-light); color: var(--primary);
     display: inline-flex; align-items: center; justify-content: center;
-    font-size: 36px; margin-bottom: 15px; border: 2px solid #14B8A6;
+    font-size: 40px; margin-bottom: 12px; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-.profile-name { font-size: 22px; color: #0F172A; margin-bottom: 4px; font-weight: bold; }
-.profile-email { color: #64748B; font-size: 14px; margin-bottom: 15px; }
+.profile-name { font-size: 20px; color: var(--text-main); margin-bottom: 4px; font-weight: 700; }
+.profile-email { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
 .verified-badge {
     display: inline-flex; align-items: center; gap: 4px;
-    background: #E6FFFA; color: #0D9488; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
+    background: #DCFCE7; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+
+/* --- NEW: Stats Section --- */
+.stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    background: white; margin: 15px 20px; border-radius: 12px;
+    padding: 15px 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    border: 1px solid #E2E8F0;
+}
+.stat-item { text-align: center; border-right: 1px solid #F1F5F9; }
+.stat-item:last-child { border-right: none; }
+.stat-value { display: block; font-size: 18px; font-weight: 700; color: var(--primary); }
+.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+/* --- NEW: Filter Bar --- */
+.filter-container { padding: 0 20px; margin-bottom: 15px; }
+.search-wrapper {
+    position: relative; display: flex; align-items: center;
+}
+.search-wrapper i { position: absolute; left: 12px; color: var(--text-muted); font-size: 18px; }
+.search-input {
+    width: 100%; padding: 10px 10px 10px 40px; border-radius: 10px;
+    border: 1px solid #E2E8F0; outline: none; font-size: 14px;
 }
 
 /* Listings Container */
-.section-title { padding: 0 20px; font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #0F172A; }
-.listings-container { padding: 0 20px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 15px; }
+.section-title { padding: 0 20px; font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
+.listings-container { padding: 0 20px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 12px; }
 
 /* List View Card */
 .inventory-card {
-    background: white; border-radius: 12px; padding: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px;
+    background: white; border-radius: 14px; padding: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #F1F5F9;
 }
 .inventory-details { display: flex; gap: 12px; align-items: center; }
 .inventory-image {
-    width: 70px; height: 70px; border-radius: 8px; background: #F1F5F9;
+    width: 75px; height: 75px; border-radius: 10px; background: #F8FAFC;
     object-fit: cover; flex-shrink: 0;
 }
 .inventory-info { flex: 1; overflow: hidden; }
-.inventory-title { font-size: 15px; font-weight: 600; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.inventory-price { font-size: 14px; color: #14B8A6; font-weight: bold; margin-top: 4px; }
-.inventory-status { font-size: 12px; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 4px; font-weight: bold;}
-.status-available { background: #E6FFFA; color: #0D9488; }
-.status-sold { background: #FEE2E2; color: #EF4444; }
+.inventory-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
+.inventory-price { font-size: 15px; color: var(--primary); font-weight: 700; }
+.status-pill { 
+    font-size: 11px; padding: 2px 8px; border-radius: 6px; 
+    display: inline-block; margin-top: 6px; font-weight: 700; 
+}
+.status-available { background: #E0E7FF; color: var(--primary); }
+.status-sold { background: #FEE2E2; color: var(--danger); }
 
 /* Action Buttons */
-.inventory-actions { display: flex; gap: 10px; border-top: 1px solid #F1F5F9; padding-top: 10px; }
+.inventory-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F8FAFC; }
 .btn-action {
-    flex: 1; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 600;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; border: none;
+    flex: 1; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; border: none;
+    transition: 0.2s;
 }
-.btn-mark-sold { background: #F8FAFC; border: 1px solid #E2E8F0; color: #0F172A; }
-.btn-mark-sold:active { background: #E2E8F0; }
-.btn-delete { background: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; }
-.btn-delete:active { background: #FEE2E2; }
+.btn-mark-sold { background: var(--bg-body); color: var(--text-main); }
+.btn-delete { background: #FFF1F2; color: var(--danger); }
 
 /* Bottom Nav */
 .bottom-nav {
     background: white; padding: 10px 0; display: flex; justify-content: space-around;
-    position: fixed; bottom: 0; width: 100%; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100;
+    position: fixed; bottom: 0; width: 100%; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); z-index: 100;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; color: #888; text-decoration: none; position: relative; }
-.nav-item.active { color: #14B8A6; }
-.nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
-.nav-item p { font-size: 0.8rem; }
+.nav-item { display: flex; flex-direction: column; align-items: center; color: #94A3B8; text-decoration: none; }
+.nav-item.active { color: var(--primary); }
+.nav-item i { font-size: 24px; margin-bottom: 2px; }
+.nav-item p { font-size: 11px; font-weight: 500; }
 
 </style>
 </head>
@@ -88,41 +125,60 @@ body { background: #F8FAFC; color: #333; display: flex; flex-direction: column; 
     <div class="app-bar">
         <button class="icon-btn" onclick="window.history.back()"><i class="material-icons">arrow_back</i></button>
         <h1>My Profile</h1>
-        <button class="icon-btn" onclick="logout()" title="Logout"><i class="material-icons">logout</i></button>
+        <button class="icon-btn" onclick="logout()"><i class="material-icons">logout</i></button>
     </div>
 
     <div class="profile-header">
-        <div class="avatar"><i class="material-icons" style="font-size: 40px;">person</i></div>
+        <div class="avatar"><i class="material-icons">person_outline</i></div>
         <h2 class="profile-name" id="userName">Loading...</h2>
-        <p class="profile-email" id="userEmail">loading@student.edu</p>
+        <p class="profile-email" id="userEmail">...</p>
         <span class="verified-badge"><i class="material-icons" style="font-size: 14px;">verified</i> Verified Student</span>
+    </div>
+
+    <!-- NEW: Dashboard Stats -->
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-value" id="statActive">0</span>
+            <span class="stat-label">Active Ads</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="statSold">0</span>
+            <span class="stat-label">Sold</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="statRevenue">₹0</span>
+            <span class="stat-label">Earnings</span>
+        </div>
+    </div>
+
+    <div class="filter-container">
+        <div class="search-wrapper">
+            <i class="material-icons">search</i>
+            <input type="text" id="inventorySearch" class="search-input" placeholder="Search my items..." oninput="filterListings()">
+        </div>
     </div>
 
     <h3 class="section-title">My Inventory</h3>
     
     <div class="listings-container" id="myListingsContainer">
-        <p style="text-align: center; color: #64748B;">Loading your items...</p>
+        <p style="text-align: center; color: #64748B;">Fetching your vault...</p>
     </div>
 
     <div class="bottom-nav">
-        <a href="dashboard.html" class="nav-item"><i class="material-icons">home</i><p>Home</p></a>
-        <a href="add-product.html" class="nav-item"><i class="material-icons">add_circle_outline</i><p>Sell</p></a>
-        <a href="chats.html" class="nav-item"><i class="material-icons">chat</i><p>Chat</p></a>
-        <a href="profile.html" class="nav-item active"><i class="material-icons">person</i><p>Profile</p></a>
+        <a href="dashboard.html" class="nav-item"><i class="material-icons">grid_view</i><p>Home</p></a>
+        <a href="add-product.html" class="nav-item"><i class="material-icons">add_box</i><p>Sell</p></a>
+        <a href="chats.html" class="nav-item"><i class="material-icons">forum</i><p>Chat</p></a>
+        <a href="profile.html" class="nav-item active"><i class="material-icons">account_circle</i><p>Profile</p></a>
     </div>
 
 <script>
 const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
 let currentUserId = null;
+let allItems = []; // Store items locally for searching
 
-// 1. Authenticate & Load User Data
 async function initProfile() {
     const { data: { session }, error } = await supabaseClient.auth.getSession();
-    
-    if (!session) {
-        window.location.href = "index.html";
-        return;
-    }
+    if (!session) { window.location.href = "index.html"; return; }
     
     currentUserId = session.user.id;
     document.getElementById('userEmail').innerText = session.user.email;
@@ -133,20 +189,13 @@ async function initProfile() {
         .eq('id', currentUserId)
         .single();
         
-    if (profile && profile.full_name) {
-        document.getElementById('userName').innerText = profile.full_name;
-    } else {
-        document.getElementById('userName').innerText = "Student";
-    }
-
+    document.getElementById('userName').innerText = profile?.full_name || "Dorm Member";
     fetchMyListings();
 }
 
-// 2. Fetch Only User's Items
 async function fetchMyListings() {
     const container = document.getElementById('myListingsContainer');
     
-    // CHANGED: 'listings' is now 'products'
     const { data: listings, error } = await supabaseClient
         .from('products')
         .select('*')
@@ -154,85 +203,89 @@ async function fetchMyListings() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        container.innerHTML = `<p style="color: red; text-align: center;">Error loading items.</p>`;
+        container.innerHTML = `<p style="color: var(--danger); text-align: center;">Error loading items.</p>`;
         return;
     }
 
+    allItems = listings;
+    updateStats(listings);
+    renderListings(listings);
+}
+
+// NEW: Update Dashboard Stats
+function updateStats(items) {
+    const active = items.filter(i => i.status !== 'Sold').length;
+    const soldItems = items.filter(i => i.status === 'Sold');
+    const revenue = soldItems.reduce((acc, curr) => acc + (parseFloat(curr.price) || 0), 0);
+
+    document.getElementById('statActive').innerText = active;
+    document.getElementById('statSold').innerText = soldItems.length;
+    document.getElementById('statRevenue').innerText = `₹${revenue}`;
+}
+
+// NEW: Search Filter Logic
+function filterListings() {
+    const query = document.getElementById('inventorySearch').value.toLowerCase();
+    const filtered = allItems.filter(item => item.title.toLowerCase().includes(query));
+    renderListings(filtered);
+}
+
+function renderListings(items) {
+    const container = document.getElementById('myListingsContainer');
     container.innerHTML = ''; 
 
-    if (listings.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: #64748B; margin-top: 20px;">You haven't listed any items yet.</p>
-                               <button onclick="window.location.href='add-product.html'" style="display: block; margin: 20px auto; padding: 10px 20px; background: #14B8A6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Add Your First Item</button>`;
+    if (items.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <i class="material-icons" style="font-size: 48px; color: #CBD5E1;">inventory_2</i>
+                <p style="color: #64748B; margin-top: 10px;">No items found.</p>
+            </div>`;
         return;
     }
 
-    listings.forEach(item => {
+    items.forEach(item => {
         const isSold = item.status === 'Sold';
-        const statusClass = isSold ? 'status-sold' : 'status-available';
-        const imageSrc = item.image_url ? item.image_url : 'https://via.placeholder.com/70?text=No+Img';
+        const imageSrc = item.image_url || 'https://via.placeholder.com/150?text=No+Image';
         
-        const toggleSoldText = isSold ? 'Mark Available' : 'Mark Sold';
-        const toggleSoldIcon = isSold ? 'replay' : 'check_circle';
-
-        const cardHtml = `
+        container.innerHTML += `
             <div class="inventory-card" id="item-${item.id}">
                 <div class="inventory-details">
                     <img src="${imageSrc}" class="inventory-image" alt="Item">
                     <div class="inventory-info">
                         <div class="inventory-title">${item.title}</div>
                         <div class="inventory-price">₹${item.price}</div>
-                        <div class="inventory-status ${statusClass}">${item.status}</div>
+                        <div class="status-pill ${isSold ? 'status-sold' : 'status-available'}">
+                            ${item.status}
+                        </div>
                     </div>
                 </div>
                 <div class="inventory-actions">
                     <button class="btn-action btn-mark-sold" onclick="toggleStatus('${item.id}', '${item.status}')">
-                        <i class="material-icons" style="font-size: 16px;">${toggleSoldIcon}</i> ${toggleSoldText}
+                        <i class="material-icons">${isSold ? 'refresh' : 'check_circle'}</i> 
+                        ${isSold ? 'Relist' : 'Mark Sold'}
                     </button>
                     <button class="btn-action btn-delete" onclick="deleteItem('${item.id}')">
-                        <i class="material-icons" style="font-size: 16px;">delete</i> Delete
+                        <i class="material-icons">delete_outline</i> Delete
                     </button>
                 </div>
             </div>
         `;
-        container.innerHTML += cardHtml;
     });
 }
 
-// 3. Mark as Sold / Mark Available Logic
 async function toggleStatus(itemId, currentStatus) {
     const newStatus = currentStatus === 'Available' ? 'Sold' : 'Available';
-    
-    // CHANGED: 'listings' is now 'products'
-    const { error } = await supabaseClient
-        .from('products')
-        .update({ status: newStatus })
-        .eq('id', itemId);
-
-    if (!error) {
-        fetchMyListings();
-    } else {
-        alert("Error updating status: " + error.message);
-    }
+    const { error } = await supabaseClient.from('products').update({ status: newStatus }).eq('id', itemId);
+    if (!error) fetchMyListings();
 }
 
-// 4. Delete Logic
 async function deleteItem(itemId) {
-    if(confirm("Are you sure you want to permanently delete this listing?")) {
-        // CHANGED: 'listings' is now 'products'
-        const { error } = await supabaseClient
-            .from('products')
-            .delete()
-            .eq('id', itemId);
-
-        if (!error) {
-            document.getElementById(`item-${itemId}`).remove(); 
-        } else {
-            alert("Error deleting item: " + error.message);
-        }
+    if(confirm("Delete this listing permanently?")) {
+        const { error } = await supabaseClient.from('products').delete().eq('id', itemId);
+        if (!error) fetchMyListings();
     }
 }
 
-// 5. Logout
 async function logout(){
     await supabaseClient.auth.signOut();
     window.location = "index.html";
