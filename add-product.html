@@ -179,14 +179,14 @@ document.getElementById('addProductForm').addEventListener('submit', async (e) =
             
             // Make sure you have a bucket named 'product_images' created in Supabase!
             const { error: uploadError } = await supabaseClient.storage
-                .from('product_images')
+                .from('product-images')
                 .upload(fileName, file);
 
             if (uploadError) throw uploadError;
 
             // Get the public URL for the database
             const { data: urlData } = supabaseClient.storage
-                .from('product_images')
+                .from('product-images')
                 .getPublicUrl(fileName);
                 
             imageUrl = urlData.publicUrl;
