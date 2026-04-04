@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages - DormKart</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+/* CSS Reset and Global Styles */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: #F8FAFC; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* App Bar */
+.app-bar {
+    background: #14B8A6; color: white; padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
+}
+.app-bar h1 { font-size: 20px; font-weight: 500; }
+.icon-btn { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; }
+
+/* Search Inbox */
+.search-inbox { padding: 15px 20px; background: white; border-bottom: 1px solid #E2E8F0; }
+.search-inbox input {
+    width: 100%; padding: 12px 16px; border: 1px solid #E2E8F0;
+    border-radius: 8px; font-size: 14px; background: #F8FAFC; outline: none;
+}
+.search-inbox input:focus { border-color: #14B8A6; }
+
+/* Chat List */
+.chat-list { display: flex; flex-direction: column; padding-bottom: 80px; }
+.chat-item {
+    display: flex; align-items: center; padding: 16px 20px;
+    background: white; border-bottom: 1px solid #E2E8F0;
+    cursor: pointer; transition: background 0.2s;
+}
+.chat-item:active { background: #F1F5F9; }
+
+.chat-avatar {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: #E6FFFA; color: #14B8A6;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 15px; font-size: 24px; font-weight: bold; flex-shrink: 0;
+}
+
+.chat-details { flex: 1; overflow: hidden; }
+.chat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.chat-name { font-weight: 600; color: #0F172A; font-size: 16px; }
+.chat-time { font-size: 12px; color: #94A3B8; }
+.chat-item-title { font-size: 13px; color: #14B8A6; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.chat-last-message { font-size: 14px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: #64748B; }
+
+/* Bottom Navigation */
+.bottom-nav {
+    background: white; padding: 10px 0; display: flex; justify-content: space-around;
+    position: fixed; bottom: 0; width: 100%; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100;
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; color: #888; text-decoration: none; position: relative; cursor: pointer; }
+.nav-item.active { color: #14B8A6; }
+.nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
+.nav-item p { font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+    <div class="app-bar">
+        <button class="icon-btn" onclick="window.history.back()"><i class="material-icons">arrow_back</i></button>
+        <h1>Messages</h1>
+        <button class="icon-btn"><i class="material-icons">more_vert</i></button>
+    </div>
+
+    <div class="search-inbox">
+        <input type="text" placeholder="Search your chats...">
+    </div>
+
+    <div class="chat-list" id="chatListContainer">
+        <p class="empty-state">Loading messages...</p>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i class="material-icons">home</i><p>Home</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='add-product.html'">
+            <i class="material-icons">add_box</i><p>List Item</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='swap.html'">
+            <i class="material-icons">swap_horiz</i><p>Swap</p>
+        </div>
+        <div class="nav-item active" onclick="window.location.href='chats.html'">
+            <i class="material-icons">chat</i><p>Chat</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <i class="material-icons">person</i><p>Profile</p>
+        </div>
+    </div>
+
+<script>
+const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+let currentUserId = null;
+
+async function initInbox() {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = "index.html";
+        return;
+    }
+    currentUserId = session.user.id;
+    fetchInbox();
+}
+
+async function fetchInbox() {
+    const container = document.getElementById('chatListContainer');
+    
+    try {
+        // Fetch messages where user is either sender or receiver
+        // Note: For a production app, you would typically use a dedicated 'chat_rooms' table
+        // But here we pull recent messages and group them in JS
+        const { data: messages, error } = await supabaseClient
+            .from('messages')
+            .select('*')
+            .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        container.innerHTML = '';
+
+        if (!messages || messages.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="material-icons" style="font-size: 48px; color: #CBD5E1; margin-bottom: 10px;">forum</i>
+                    <p>No messages yet.</p>
+                    <p style="font-size: 14px; margin-top: 5px;">Start a conversation from a listing!</p>
+                </div>`;
+            return;
+        }
+
+        // Group messages by Listing ID to create unique chat threads
+        const threads = {};
+        messages.forEach(msg => {
+            if (!threads[msg.listing_id]) {
+                threads[msg.listing_id] = msg; // Save the most recent message
+            }
+        });
+
+        // Generate HTML for each thread
+        Object.values(threads).forEach(thread => {
+            // Determine if the other person is the sender or receiver
+            const isSender = thread.sender_id === currentUserId;
+            const otherUserId = isSender ? thread.receiver_id : thread.sender_id;
+            
+            // Format time (Basic)
+            const date = new Date(thread.created_at);
+            const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            const chatHtml = `
+                <div class="chat-item" onclick="window.location.href='chat-room.html?listing_id=${thread.listing_id}&other_user=${otherUserId}'">
+                    <div class="chat-avatar">
+                        <i class="material-icons">person</i>
+                    </div>
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">User ${otherUserId.substring(0,4)}...</span>
+                            <span class="chat-time">${timeString}</span>
+                        </div>
+                        <div class="chat-item-title">Listing #${thread.listing_id.substring(0,8)}</div>
+                        <div class="chat-last-message">
+                            ${isSender ? 'You: ' : ''}${thread.content}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += chatHtml;
+        });
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = `<p class="empty-state" style="color: red;">Failed to load messages.</p>`;
+    }
+}
+
+initInbox();
+</script>
+</body>
+</html>
