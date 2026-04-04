@@ -1,292 +1,597 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Profile | DormKart</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary: #14B8A6;
-            --bg: #F8FAFC;
-            --card: #FFFFFF;
-            --text: #1E293B;
-            --text-light: #64748B;
-            --border: #E2E8F0;
-            --shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body.dark-mode {
-            --bg: #0F172A;
-            --card: #1E293B;
-            --text: #F1F5F9;
-            --text-light: #94A3B8;
-            --border: #334155;
-        }
+<title>DormKart Profile</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 100px; transition: 0.3s; }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        /* Navigation Bar */
-        .app-bar {
-            background: var(--card); padding: 15px 20px; display: flex;
-            justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
-        }
+<script src="config.js"></script>
 
-        /* Profile Header */
-        .profile-header {
-            background: var(--card); padding: 30px 20px 50px;
-            border-radius: 0 0 30px 30px; box-shadow: var(--shadow);
-        }
-        .profile-top { display: flex; align-items: center; gap: 20px; }
-        .avatar-box { position: relative; width: 80px; height: 80px; }
-        .avatar-box img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
-        .edit-pic { position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; border-radius: 50%; padding: 4px; cursor: pointer; border: 2px solid var(--card); }
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-        .rating-badge { background: #FFFBEB; color: #B45309; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; }
+<style>
 
-        /* Completion Widget */
-        .completion-container { margin-top: 20px; background: var(--bg); padding: 12px; border-radius: 12px; }
-        .progress-bar { height: 6px; background: var(--border); border-radius: 10px; margin-top: 8px; overflow: hidden; }
-        #progressFill { height: 100%; background: var(--primary); transition: 0.5s; }
+body{
+margin:0;
+font-family:Segoe UI;
+background:#F8FAFC;
+padding-bottom:90px;
+}
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; margin-top: -30px; margin-bottom: 25px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 16px; text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .stat-card b { display: block; font-size: 18px; color: var(--primary); }
-        .stat-card span { font-size: 10px; color: var(--text-light); text-transform: uppercase; font-weight: 700; }
+.header{
+background:#14B8A6;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-        /* Search Bar */
-        .search-area { padding: 0 20px; margin-bottom: 20px; }
-        .search-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; }
+.profile{
+background:white;
+padding:20px;
+text-align:center;
+}
 
-        /* Product Cards */
-        .listings-container { padding: 0 20px; display: grid; gap: 15px; }
-        .product-card { background: var(--card); border-radius: 16px; padding: 12px; display: flex; gap: 15px; border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;}
-        .product-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; }
-        .p-price { color: var(--primary); font-weight: 700; font-size: 16px; }
-        .card-actions { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-icon { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text); }
-        .btn-delete { color: #EF4444; border-color: #FEE2E2; }
-        .sold-label { position: absolute; top: 10px; right: 10px; background: #EF4444; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+.avatar{
+width:90px;
+height:90px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid #14B8A6;
+}
 
-        /* Modal */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: var(--card); width: 100%; max-width: 400px; padding: 25px; border-radius: 20px; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-light); }
-        .input-group input, .input-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+.btn{
+background:#14B8A6;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+cursor:pointer;
+margin-top:10px;
+}
 
-        .btn-main { background: var(--primary); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.stats{
+display:flex;
+justify-content:space-around;
+padding:15px;
+background:white;
+margin-top:10px;
+}
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); }
-        .nav-item { text-decoration: none; color: var(--text-light); text-align: center; font-size: 10px; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { display: block; font-size: 24px; }
-    </style>
+.stat b{
+display:block;
+color:#14B8A6;
+}
+
+.search{
+padding:10px;
+margin:15px;
+width:calc(100% - 30px);
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.listings{
+padding:15px;
+display:grid;
+gap:12px;
+}
+
+.card{
+background:white;
+padding:10px;
+border-radius:10px;
+display:flex;
+gap:10px;
+position:relative;
+overflow:hidden;
+}
+
+.card img{
+width:80px;
+height:80px;
+border-radius:8px;
+object-fit:cover;
+}
+
+.actions button{
+margin-right:5px;
+border:none;
+padding:5px 10px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.sold{background:#EF4444;color:white;}
+.delete{background:#333;color:white;}
+
+.swipe-actions{
+position:absolute;
+right:-120px;
+top:0;
+height:100%;
+display:flex;
+transition:0.3s;
+}
+
+.card.show .swipe-actions{
+right:0;
+}
+
+.swipe-actions button{
+width:60px;
+color:white;
+border:none;
+}
+
+.delete-btn{background:#EF4444;}
+.sold-btn{background:#14B8A6;}
+
+.chart{
+padding:20px;
+background:white;
+margin:10px;
+border-radius:10px;
+}
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+width:100%;
+background:white;
+display:flex;
+justify-content:space-around;
+padding:12px 0;
+border-top:1px solid #eee;
+}
+
+.bottom-nav a{
+text-decoration:none;
+color:#666;
+text-align:center;
+}
+
+.bottom-nav a.active{
+color:#14B8A6;
+}
+
+.notif{
+position:relative;
+}
+
+.notif span{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:white;
+font-size:10px;
+padding:2px 5px;
+border-radius:10px;
+}
+
+</style>
 </head>
+
 <body>
 
-    <div class="app-bar">
-        <i class="material-icons" onclick="toggleDarkMode()">dark_mode</i>
-        <h2 style="font-size: 16px;">My Profile</h2>
-        <i class="material-icons" onclick="logout()" style="color: #EF4444;">logout</i>
-    </div>
+<div class="header">
 
-    <div class="profile-header">
-        <div class="profile-top">
-            <div class="avatar-box">
-                <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=14B8A6&color=fff">
-                <label for="avatarInput" class="edit-pic"><i class="material-icons" style="font-size: 16px;">camera_alt</i></label>
-                <input type="file" id="avatarInput" hidden onchange="uploadAvatar(this)">
-            </div>
-            <div class="user-meta">
-                <h2 id="userName">Loading...</h2>
-                <p id="userCollege" style="font-size: 13px; color: var(--text-light);">University Name</p>
-                <div class="rating-badge">
-                    <i class="material-icons" style="font-size: 14px;">star</i>
-                    <span id="avgRating">0.0</span> <span style="font-weight: 400; opacity: 0.6;">(<span id="reviewCount">0</span>)</span>
-                </div>
-            </div>
-        </div>
+<h3>DormKart</h3>
 
-        <p id="userBio" style="font-size: 13px; color: var(--text-light); margin-top: 15px;">Add a bio to build trust!</p>
-        
-        <div class="completion-container">
-            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700;">
-                <span>Profile Completion</span>
-                <span id="progressPercent">40%</span>
-            </div>
-            <div class="progress-bar"><div id="progressFill" style="width: 40%;"></div></div>
-        </div>
+<div class="notif">
+<i class="material-icons">notifications</i>
+<span id="notifCount">0</span>
+</div>
 
-        <button class="btn-main" style="margin-top: 15px; height: 45px;" onclick="openModal()">Edit Profile</button>
-    </div>
+</div>
 
-    <div class="stats-grid">
-        <div class="stat-card"><b id="statActive">0</b><span>Active</span></div>
-        <div class="stat-card"><b id="statSold">0</b><span>Sold</span></div>
-        <div class="stat-card"><b id="statEarnings">₹0</b><span>Earnings</span></div>
-    </div>
 
-    <div class="search-area">
-        <input type="text" class="search-input" id="inventorySearch" placeholder="Search my items..." onkeyup="filterInventory()">
-    </div>
+<div class="profile">
 
-    <div class="listings-container" id="listingsWrapper">
-        </div>
+<img id="avatar" class="avatar"
+src="https://ui-avatars.com/api/?name=User">
 
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 20px;">Edit Profile</h3>
-            <div class="input-group">
-                <label>Full Name</label>
-                <input type="text" id="editName">
-            </div>
-            <div class="input-group">
-                <label>College</label>
-                <input type="text" id="editCollege">
-            </div>
-            <div class="input-group">
-                <label>Bio</label>
-                <textarea id="editBio" rows="3"></textarea>
-            </div>
-            <button class="btn-main" onclick="saveProfile()">Save Changes</button>
-            <button style="background:transparent; border:none; width:100%; margin-top:12px; color:var(--text-light);" onclick="closeModal()">Cancel</button>
-        </div>
-    </div>
+<br>
 
-    <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item"><i class="material-icons">explore</i><span>Home</span></a>
-        <a href="add-product.html" class="nav-item"><i class="material-icons">add_box</i><span>Sell</span></a>
-        <a href="chats.html" class="nav-item"><i class="material-icons">chat</i><span>Chats</span></a>
-        <a href="#" class="nav-item active"><i class="material-icons">person</i><span>Profile</span></a>
-    </nav>
+<input type="file" id="avatarInput" hidden onchange="uploadAvatar(this)">
 
-    <script>
-        const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-        let currentUser, allProducts = [];
+<button class="btn"
+onclick="document.getElementById('avatarInput').click()">
+Change Photo
+</button>
 
-        async function initProfile() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) return window.location.href = "login.html";
-            currentUser = session.user;
-            
-            loadProfile();
-            loadInventory();
-            loadReviews();
-            checkTheme();
-        }
+<h2 id="name">Loading...</h2>
 
-        async function loadProfile() {
-            const { data } = await supabaseClient.from("profiles").select("*").eq("id", currentUser.id).single();
-            if (data) {
-                document.getElementById("userName").innerText = data.full_name || "Dorm Member";
-                document.getElementById("userCollege").innerText = data.college || "Add College";
-                document.getElementById("userBio").innerText = data.bio || "Tell buyers about yourself";
-                if (data.avatar_url) document.getElementById("userAvatar").src = data.avatar_url;
-                
-                // Set modal values
-                document.getElementById("editName").value = data.full_name || "";
-                document.getElementById("editCollege").value = data.college || "";
-                document.getElementById("editBio").value = data.bio || "";
-                
-                updateProfileCompletion(data);
-            }
-        }
+<p id="college"></p>
 
-        async function loadReviews() {
-            const { data } = await supabaseClient.from("reviews").select("rating").eq("seller_id", currentUser.id);
-            if (data && data.length > 0) {
-                const avg = data.reduce((acc, c) => acc + c.rating, 0) / data.length;
-                document.getElementById("avgRating").innerText = avg.toFixed(1);
-                document.getElementById("reviewCount").innerText = data.length;
-            }
-        }
+<p id="bio"></p>
 
-        async function loadInventory() {
-            const { data } = await supabaseClient.from("products").select("*").eq("seller_id", currentUser.id).order("created_at", { ascending: false });
-            allProducts = data || [];
-            renderProducts(allProducts);
-            updateStats(allProducts);
-        }
+<p>⭐ <span id="rating">0.0</span>
+(<span id="reviews">0</span>)</p>
 
-        function renderProducts(items) {
-            const container = document.getElementById("listingsWrapper");
-            container.innerHTML = "";
-            items.forEach(item => {
-                const isSold = item.status === "sold";
-                container.innerHTML += `
-                    <div class="product-card">
-                        <img src="${item.image_url}" class="product-img">
-                        <div class="product-content">
-                            <div class="p-price">₹${item.price}</div>
-                            <div style="font-weight:600; font-size:14px; margin:2px 0;">${item.title}</div>
-                            <div class="card-actions">
-                                <button class="btn-icon" onclick="toggleSold('${item.id}','${item.status}')">${isSold ? 'Relist' : 'Mark Sold'}</button>
-                                <button class="btn-icon" onclick="editListing('${item.id}')">Edit</button>
-                                <button class="btn-icon btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
-                            </div>
-                        </div>
-                        ${isSold ? '<div class="sold-label">SOLD</div>' : ''}
-                    </div>`;
-            });
-        }
+<button class="btn" onclick="openModal()">Edit Profile</button>
 
-        function updateStats(items) {
-            const active = items.filter(i => i.status !== "sold").length;
-            const sold = items.filter(i => i.status === "sold").length;
-            const revenue = items.filter(i => i.status === "sold").reduce((acc, c) => acc + Number(c.price), 0);
-            document.getElementById("statActive").innerText = active;
-            document.getElementById("statSold").innerText = sold;
-            document.getElementById("statEarnings").innerText = "₹" + revenue;
-        }
+</div>
 
-        async function saveProfile() {
-            const updates = {
-                full_name: document.getElementById("editName").value,
-                college: document.getElementById("editCollege").value,
-                bio: document.getElementById("editBio").value,
-                updated_at: new Date()
-            };
-            const { error } = await supabaseClient.from("profiles").update(updates).eq("id", currentUser.id);
-            if (!error) { closeModal(); loadProfile(); toast("Profile Updated!"); }
-        }
 
-        async function uploadAvatar(input) {
-            const file = input.files[0];
-            const fileName = `avatars/${currentUser.id}-${Date.now()}`;
-            await supabaseClient.storage.from("dormkart-assets").upload(fileName, file);
-            const { data } = supabaseClient.storage.from("dormkart-assets").getPublicUrl(fileName);
-            await supabaseClient.from("profiles").update({ avatar_url: data.publicUrl }).eq("id", currentUser.id);
-            document.getElementById("userAvatar").src = data.publicUrl;
-            toast("Photo Updated!");
-        }
+<div class="stats">
 
-        // Helper Functions
-        function openModal() { document.getElementById("editModal").style.display = "flex"; }
-        function closeModal() { document.getElementById("editModal").style.display = "none"; }
-        function toggleDarkMode() { document.body.classList.toggle("dark-mode"); }
-        function filterInventory() {
-            const q = document.getElementById("inventorySearch").value.toLowerCase();
-            renderProducts(allProducts.filter(p => p.title.toLowerCase().includes(q)));
-        }
-        function updateProfileCompletion(p) {
-            let s = 40; if(p.full_name) s+=20; if(p.bio) s+=20; if(p.college) s+=20;
-            document.getElementById("progressFill").style.width = s+"%";
-            document.getElementById("progressPercent").innerText = s+"%";
-        }
-        async function logout() { await supabaseClient.auth.signOut(); window.location = "index.html"; }
-        function toast(m) { alert(m); } // Replace with your custom toast if needed
+<div class="stat">
+<b id="active">0</b>
+Active
+</div>
 
-        initProfile();
-    </script>
+<div class="stat">
+<b id="sold">0</b>
+Sold
+</div>
+
+<div class="stat">
+<b id="earnings">₹0</b>
+Earned
+</div>
+
+</div>
+
+
+<div class="chart">
+<h3>Seller Analytics</h3>
+<canvas id="analyticsChart"></canvas>
+</div>
+
+
+<input class="search"
+placeholder="Search listings"
+onkeyup="searchItems(this.value)">
+
+
+<div class="listings" id="listings"></div>
+
+
+
+<div class="bottom-nav">
+
+<a href="dashboard.html">
+<i class="material-icons">home</i><br>Home
+</a>
+
+<a href="add-product.html">
+<i class="material-icons">add_box</i><br>Sell
+</a>
+
+<a href="chats.html">
+<i class="material-icons">chat</i><br>Chat
+</a>
+
+<a href="profile.html" class="active">
+<i class="material-icons">person</i><br>Profile
+</a>
+
+</div>
+
+
+<script>
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_CONFIG.url,
+SUPABASE_CONFIG.key
+)
+
+let user
+let products=[]
+
+async function init(){
+
+const {data:{session}} =
+await supabaseClient.auth.getSession()
+
+if(!session){
+window.location="index.html"
+return
+}
+
+user=session.user
+
+loadProfile()
+loadProducts()
+loadReviews()
+loadNotifications()
+
+}
+
+init()
+
+
+async function loadProfile(){
+
+const {data} =
+await supabaseClient
+.from("profiles")
+.select("*")
+.eq("id",user.id)
+.single()
+
+if(!data) return
+
+document.getElementById("name").innerText=data.full_name||"User"
+document.getElementById("college").innerText=data.college||""
+document.getElementById("bio").innerText=data.bio||""
+
+if(data.avatar_url)
+document.getElementById("avatar").src=data.avatar_url
+
+}
+
+
+async function loadNotifications(){
+
+const {data} =
+await supabaseClient
+.from("notifications")
+.select("*")
+.eq("user_id",user.id)
+.eq("is_read",false)
+
+document.getElementById("notifCount").innerText=data.length
+
+}
+
+
+async function loadReviews(){
+
+const {data} =
+await supabaseClient
+.from("reviews")
+.select("rating")
+.eq("seller_id",user.id)
+
+if(!data) return
+
+let avg=0
+
+if(data.length>0){
+avg=data.reduce((a,b)=>a+b.rating,0)/data.length
+}
+
+document.getElementById("rating").innerText=avg.toFixed(1)
+document.getElementById("reviews").innerText=data.length
+
+}
+
+
+async function loadProducts(){
+
+const {data} =
+await supabaseClient
+.from("products")
+.select("*")
+.eq("seller_id",user.id)
+
+products=data
+
+renderProducts(data)
+updateStats(data)
+loadAnalytics(data)
+
+}
+
+
+function renderProducts(items){
+
+const container=document.getElementById("listings")
+
+container.innerHTML=""
+
+items.forEach(p=>{
+
+container.innerHTML+=`
+
+<div class="card">
+
+<img src="${p.image_url}">
+
+<div>
+
+<b>₹${p.price}</b>
+<p>${p.title}</p>
+<p>👁 ${p.views||0} views</p>
+
+<div class="actions">
+
+<button onclick="addWishlist('${p.id}')">❤️</button>
+
+</div>
+
+</div>
+
+<div class="swipe-actions">
+
+<button class="sold-btn"
+onclick="toggleSold('${p.id}','${p.status}')">
+Sold
+</button>
+
+<button class="delete-btn"
+onclick="deleteItem('${p.id}')">
+Delete
+</button>
+
+</div>
+
+</div>
+
+`
+
+})
+
+enableSwipe()
+
+}
+
+
+function enableSwipe(){
+
+document.querySelectorAll(".card")
+.forEach(card=>{
+
+let startX=0
+
+card.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX
+})
+
+card.addEventListener("touchend",e=>{
+
+let endX=e.changedTouches[0].clientX
+
+if(startX-endX>50){
+card.classList.add("show")
+}
+
+if(endX-startX>50){
+card.classList.remove("show")
+}
+
+})
+
+})
+
+}
+
+
+function updateStats(items){
+
+let active=0
+let sold=0
+let earnings=0
+
+items.forEach(p=>{
+
+if(p.status==="sold"){
+sold++
+earnings+=Number(p.price)
+}else{
+active++
+}
+
+})
+
+document.getElementById("active").innerText=active
+document.getElementById("sold").innerText=sold
+document.getElementById("earnings").innerText="₹"+earnings
+
+}
+
+
+function loadAnalytics(data){
+
+let active=data.filter(i=>i.status==="available").length
+let sold=data.filter(i=>i.status==="sold").length
+
+new Chart(document.getElementById("analyticsChart"),{
+type:"bar",
+data:{
+labels:["Active","Sold"],
+datasets:[{
+data:[active,sold]
+}]
+}
+})
+
+}
+
+
+async function addWishlist(id){
+
+await supabaseClient
+.from("wishlist")
+.insert({
+user_id:user.id,
+product_id:id
+})
+
+alert("Added to wishlist")
+
+}
+
+
+async function toggleSold(id,status){
+
+const newStatus =
+status==="sold"?"available":"sold"
+
+await supabaseClient
+.from("products")
+.update({status:newStatus})
+.eq("id",id)
+
+loadProducts()
+
+}
+
+
+async function deleteItem(id){
+
+if(!confirm("Delete item?")) return
+
+await supabaseClient
+.from("products")
+.delete()
+.eq("id",id)
+
+loadProducts()
+
+}
+
+
+function searchItems(q){
+
+q=q.toLowerCase()
+
+renderProducts(
+products.filter(p =>
+p.title.toLowerCase().includes(q)
+)
+)
+
+}
+
+
+async function uploadAvatar(input){
+
+const file=input.files[0]
+
+const fileName=user.id+"-"+Date.now()
+
+await supabaseClient
+.storage
+.from("dormkart-assets")
+.upload(fileName,file)
+
+const {data} =
+supabaseClient
+.storage
+.from("dormkart-assets")
+.getPublicUrl(fileName)
+
+await supabaseClient
+.from("profiles")
+.update({avatar_url:data.publicUrl})
+.eq("id",user.id)
+
+document.getElementById("avatar").src=data.publicUrl
+
+}
+
+</script>
+
 </body>
 </html>
