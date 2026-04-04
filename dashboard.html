@@ -16,6 +16,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -38,9 +39,7 @@ body {
 }
 
 .hamburger-menu, .notifications-container { cursor: pointer; }
-
 .notifications-container { position: relative; }
-
 .notification-badge {
     position: absolute;
     top: -5px;
@@ -65,16 +64,10 @@ body {
     font-size: 1.2rem;
 }
 
-.logo-icon {
-    width: 24px;
-    height: 24px;
-}
+.logo-icon { width: 24px; height: 24px; }
 
 /* Hero Section */
-.hero {
-    text-align: center;
-    padding: 40px 20px;
-}
+.hero { text-align: center; padding: 40px 20px; }
 .hero h1 { font-size: 2.2rem; color: #111; margin-bottom: 8px; }
 .hero p { font-size: 1.2rem; color: #555; }
 
@@ -108,8 +101,10 @@ body {
     gap: 12px;
     padding: 0 20px;
     margin-bottom: 30px;
-    overflow-x: auto; /* Allows scrolling if buttons overflow */
+    overflow-x: auto;
 }
+.filter-buttons-container::-webkit-scrollbar { display: none; }
+
 .filter-btn {
     padding: 10px 20px;
     border-radius: 30px;
@@ -118,20 +113,18 @@ body {
     color: #555;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    transition: all 0.2s;
     white-space: nowrap;
 }
 .filter-btn.active {
     background: #14B8A6;
     color: white;
     border-color: #14B8A6;
+    box-shadow: 0 4px 10px rgba(20, 184, 166, 0.3);
 }
 
 /* Sections Global Styling */
-.section {
-    padding: 0 20px;
-    margin-bottom: 30px;
-}
+.section { padding: 0 20px; margin-bottom: 30px; }
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -146,21 +139,7 @@ body {
 }
 .section-header h2 { font-size: 1.4rem; color: #222; }
 
-/* Flash Deals */
-.flash-deals-timer {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #FFEDEA;
-    color: #EF4444;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border: 1px solid #EF4444;
-}
-
-/* Updated Grid to handle dynamic content */
+/* Product Grid */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -204,11 +183,7 @@ body {
     align-items: center;
     justify-content: center;
 }
-.product-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+.product-image-container img { width: 100%; height: 100%; object-fit: cover; }
 
 .product-title {
     font-size: 0.95rem;
@@ -216,7 +191,7 @@ body {
     margin-bottom: 6px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Adds '...' if title is too long */
+    text-overflow: ellipsis;
 }
 
 .price-container { display: flex; gap: 8px; align-items: center; margin-top: auto; }
@@ -257,7 +232,6 @@ body {
     text-align: center;
     color: #888;
     cursor: pointer;
-    text-decoration: none;
     transition: color 0.2s;
     position: relative;
     display: flex;
@@ -268,13 +242,7 @@ body {
 .nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
 .nav-item p { font-size: 0.8rem; }
 
-.logout-btn-container { padding: 0 20px; margin-bottom: 100px; text-align: right; }
-.logout-btn {
-    background: #EF4444; color: white; border: none; padding: 12px 20px;
-    border-radius: 8px; cursor: pointer; font-weight: bold;
-}
 .main-content { padding-bottom: 80px; }
-
 </style>
 </head>
 
@@ -309,21 +277,17 @@ body {
         </div>
 
         <div class="filter-buttons-container">
-            <button class="filter-btn active">Buy</button>
-            <button class="filter-btn">Sell</button>
-            <button class="filter-btn">Rent</button>
-            <button class="filter-btn">Swap</button>
+            <button class="filter-btn active" onclick="filterListings('All', this)">All</button>
+            <button class="filter-btn" onclick="filterListings('Buy/Sell', this)">Buy/Sell</button>
+            <button class="filter-btn" onclick="filterListings('Rent', this)">Rent</button>
+            <button class="filter-btn" onclick="filterListings('Swap', this)">Swap</button>
         </div>
 
         <div class="section flash-deals-section">
             <div class="section-header">
                 <div class="section-title-wrapper">
                     <i class="material-icons">flash_on</i>
-                    <h2>Flash Deals</h2>
-                </div>
-                <div class="flash-deals-timer">
-                    <i class="material-icons">schedule</i>
-                    <span>02:07:38</span>
+                    <h2>Marketplace</h2>
                 </div>
             </div>
 
@@ -331,108 +295,77 @@ body {
                 <p style="grid-column: 1 / -1; text-align: center; color: #999;">Loading marketplace...</p>
             </div>
         </div>
-
-        <div class="section curated-bundles-section">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <i class="material-icons">shopping_bag</i>
-                    <h2>Curated Bundles</h2>
-                </div>
-            </div>
-            <div class="bundle-banner">
-                <span class="seniors-tag">SENIORS SELLING OUT</span>
-                <h2>The</h2>
-                <h1>"Freshman Survival"</h1>
-            </div>
-        </div>
-
-        <div class="logout-btn-container">
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
     </div>
 
     <div class="bottom-nav">
-        <a href="index.html" class="nav-item active"><i class="material-icons">home</i><p>Home</p></a>
-        <a href="listings.html" class="nav-item"><i class="material-icons">list</i><p>Listings</p></a>
-        <a href="swap.html" class="nav-item"><i class="material-icons">swap_horiz</i><p>Swap</p></a>
-        <a href="chats.html" class="nav-item"><i class="material-icons">chat</i><p>Chat</p><span class="chat-badge">1</span></a>
-        <a href="profile.html" class="nav-item"><i class="material-icons">person</i><p>Profile</p></a>
+        <div class="nav-item active" onclick="window.location.href='dashboard.html'">
+            <i class="material-icons">home</i><p>Home</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='add-product.html'">
+            <i class="material-icons">add_box</i><p>List Item</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='swap.html'">
+            <i class="material-icons">swap_horiz</i><p>Swap</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='chats.html'">
+            <i class="material-icons">chat</i><p>Chat</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <i class="material-icons">person</i><p>Profile</p>
+        </div>
     </div>
 
 <script>
-// Initialize Supabase Client
-const supabaseClient = supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.key
-)
+const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
 
-// Auth Check
 async function checkUser(){
-    const { data } = await supabaseClient.auth.getSession()
-    if(!data.session){
-        window.location="index.html"
-    }
+    const { data } = await supabaseClient.auth.getSession();
+    if(!data.session) window.location="index.html";
 }
 checkUser();
 
-async function logout(){
-    await supabaseClient.auth.signOut()
-    window.location="index.html"
+let currentCategory = 'All';
+
+function filterListings(category, btnElement) {
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+    currentCategory = category;
+    fetchListings();
 }
 
-// FETCH DYNAMIC PRODUCTS LOGIC
 async function fetchListings() {
     const productsContainer = document.getElementById('products-container');
+    productsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #999;">Loading items...</p>`;
     
     try {
-        // Fetch from the 'listings' table created earlier
-        const { data: listings, error } = await supabaseClient
-            .from('listings')
-            .select('*')
-            .eq('status', 'Available')
-            .order('created_at', { ascending: false });
+        let query = supabaseClient.from('listings').select('*').eq('status', 'Available').order('created_at', { ascending: false });
+        if (currentCategory !== 'All') query = query.eq('category', currentCategory);
 
+        const { data: listings, error } = await query;
         if (error) throw error;
 
-        // Clear the loading message
         productsContainer.innerHTML = '';
 
-        // If no items found in DB
         if (!listings || listings.length === 0) {
-            productsContainer.innerHTML = `
-                <p style="grid-column: 1 / -1; text-align: center; color: #64748B; padding: 20px;">
-                    No items available right now. Be the first to list something!
-                </p>`;
+            productsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #64748B; padding: 20px;">No ${currentCategory !== 'All' ? currentCategory : ''} items available right now.</p>`;
             return;
         }
 
-        // Loop through the data and build HTML for each item
         listings.forEach(item => {
-            
-            // Calculate discount badge if original price exists and is higher than current price
             let discountBadge = '';
             if (item.original_price && item.original_price > item.price) {
                 const discount = Math.round(((item.original_price - item.price) / item.original_price) * 100);
                 discountBadge = `<span class="discount-badge">-${discount}% OFF</span>`;
             }
 
-            // Fallback if image is missing
-            const imageHtml = item.image_url 
-                ? `<img src="${item.image_url}" alt="${item.title}">`
-                : `<i class="material-icons" style="font-size: 40px; color: #ccc;">image_not_supported</i>`;
+            const imageHtml = item.image_url ? `<img src="${item.image_url}" alt="${item.title}">` : `<i class="material-icons" style="font-size: 40px; color: #ccc;">image_not_supported</i>`;
+            const originalPriceHtml = (item.original_price && item.original_price > item.price) ? `<span class="original-price"><s>₹${item.original_price}</s></span>` : ``;
 
-            // Strikethrough price if original price exists
-            const originalPriceHtml = (item.original_price && item.original_price > item.price)
-                ? `<span class="original-price"><s>₹${item.original_price}</s></span>`
-                : ``;
-
-            // Construct the card
             const cardHtml = `
                 <div class="product-card" onclick="window.location.href='product.html?id=${item.id}'">
                     ${discountBadge}
-                    <div class="product-image-container">
-                        ${imageHtml}
-                    </div>
+                    <div class="product-image-container">${imageHtml}</div>
                     <h3 class="product-title" title="${item.title}">${item.title}</h3>
                     <div class="price-container">
                         <span class="current-price">₹${item.price}</span>
@@ -440,24 +373,15 @@ async function fetchListings() {
                     </div>
                 </div>
             `;
-
-            // Append to the grid
             productsContainer.innerHTML += cardHtml;
         });
 
     } catch (error) {
         console.error('Error fetching listings:', error);
-        productsContainer.innerHTML = `
-            <p style="grid-column: 1 / -1; text-align: center; color: #EF4444;">
-                Failed to load items. Check console.
-            </p>`;
+        productsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #EF4444;">Failed to load items.</p>`;
     }
 }
-
-// Run the fetch function as soon as the page loads
 fetchListings();
-
 </script>
-
 </body>
 </html>
