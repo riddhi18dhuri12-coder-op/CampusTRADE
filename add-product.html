@@ -113,7 +113,6 @@ textarea.android-input { padding-left: 16px; height: 120px; resize: none; }
             <p id="statusMessage"></p>
         </form>
     </div>
-
 <script>
 const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
 let currentUserId = null;
@@ -163,7 +162,6 @@ document.getElementById('addProductForm').addEventListener('submit', async (e) =
     const description = document.getElementById('description').value;
     const file = fileInput.files[0];
 
-    // UI Loading State
     submitBtn.disabled = true;
     submitBtn.innerText = "Uploading...";
     statusMsg.style.color = "#14B8A6";
@@ -172,19 +170,16 @@ document.getElementById('addProductForm').addEventListener('submit', async (e) =
     try {
         let imageUrl = null;
 
-        // Step A: Upload Image to Supabase Storage
         if (file) {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
             
-            // Make sure you have a bucket named 'product_images' created in Supabase!
             const { error: uploadError } = await supabaseClient.storage
                 .from('product-images')
                 .upload(fileName, file);
 
             if (uploadError) throw uploadError;
 
-            // Get the public URL for the database
             const { data: urlData } = supabaseClient.storage
                 .from('product-images')
                 .getPublicUrl(fileName);
@@ -192,9 +187,9 @@ document.getElementById('addProductForm').addEventListener('submit', async (e) =
             imageUrl = urlData.publicUrl;
         }
 
-        // Step B: Save text data to Database
+        // CHANGED: 'listings' is now 'products'
         const { error: dbError } = await supabaseClient
-            .from('listings')
+            .from('products')
             .insert([{
                 seller_id: currentUserId,
                 title: title,
@@ -203,17 +198,15 @@ document.getElementById('addProductForm').addEventListener('submit', async (e) =
                 category: category,
                 description: description,
                 image_url: imageUrl,
-                status: 'Available' // Default status
+                status: 'Available' 
             }]);
 
         if (dbError) throw dbError;
 
-        // Success State
         statusMsg.style.color = "green";
         statusMsg.innerText = "Success! Returning to dashboard...";
         submitBtn.innerText = "Listed ✓";
         
-        // Redirect back to dashboard to see the new item
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1500);
