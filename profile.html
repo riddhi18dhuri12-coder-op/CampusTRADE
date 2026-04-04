@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Profile - DormKart</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background: #F8FAFC; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* App Bar */
+.app-bar {
+    background: #14B8A6; color: white; padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
+}
+.app-bar h1 { font-size: 20px; font-weight: 500; }
+.icon-btn { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; }
+
+/* Profile Header Widget */
+.profile-header {
+    background: white; padding: 30px 20px; text-align: center;
+    border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;
+}
+.avatar {
+    width: 80px; height: 80px; border-radius: 50%; background: #E6FFFA; color: #14B8A6;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 36px; margin-bottom: 15px; border: 2px solid #14B8A6;
+}
+.profile-name { font-size: 22px; color: #0F172A; margin-bottom: 4px; font-weight: bold; }
+.profile-email { color: #64748B; font-size: 14px; margin-bottom: 15px; }
+.verified-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #E6FFFA; color: #0D9488; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
+}
+
+/* Listings Container */
+.section-title { padding: 0 20px; font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #0F172A; }
+.listings-container { padding: 0 20px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 15px; }
+
+/* List View Card */
+.inventory-card {
+    background: white; border-radius: 12px; padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px;
+}
+.inventory-details { display: flex; gap: 12px; align-items: center; }
+.inventory-image {
+    width: 70px; height: 70px; border-radius: 8px; background: #F1F5F9;
+    object-fit: cover; flex-shrink: 0;
+}
+.inventory-info { flex: 1; overflow: hidden; }
+.inventory-title { font-size: 15px; font-weight: 600; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inventory-price { font-size: 14px; color: #14B8A6; font-weight: bold; margin-top: 4px; }
+.inventory-status { font-size: 12px; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 4px; font-weight: bold;}
+.status-available { background: #E6FFFA; color: #0D9488; }
+.status-sold { background: #FEE2E2; color: #EF4444; }
+
+/* Action Buttons */
+.inventory-actions { display: flex; gap: 10px; border-top: 1px solid #F1F5F9; padding-top: 10px; }
+.btn-action {
+    flex: 1; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; border: none;
+}
+.btn-mark-sold { background: #F8FAFC; border: 1px solid #E2E8F0; color: #0F172A; }
+.btn-mark-sold:active { background: #E2E8F0; }
+.btn-delete { background: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; }
+.btn-delete:active { background: #FEE2E2; }
+
+/* Bottom Nav */
+.bottom-nav {
+    background: white; padding: 10px 0; display: flex; justify-content: space-around;
+    position: fixed; bottom: 0; width: 100%; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100;
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; color: #888; text-decoration: none; position: relative; }
+.nav-item.active { color: #14B8A6; }
+.nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
+.nav-item p { font-size: 0.8rem; }
+
+</style>
+</head>
+<body>
+
+    <div class="app-bar">
+        <button class="icon-btn" onclick="window.history.back()"><i class="material-icons">arrow_back</i></button>
+        <h1>My Profile</h1>
+        <button class="icon-btn" onclick="logout()" title="Logout"><i class="material-icons">logout</i></button>
+    </div>
+
+    <div class="profile-header">
+        <div class="avatar"><i class="material-icons" style="font-size: 40px;">person</i></div>
+        <h2 class="profile-name" id="userName">Loading...</h2>
+        <p class="profile-email" id="userEmail">loading@student.edu</p>
+        <span class="verified-badge"><i class="material-icons" style="font-size: 14px;">verified</i> Verified Student</span>
+    </div>
+
+    <h3 class="section-title">My Inventory</h3>
+    
+    <div class="listings-container" id="myListingsContainer">
+        <p style="text-align: center; color: #64748B;">Loading your items...</p>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item"><i class="material-icons">home</i><p>Home</p></a>
+        <a href="add-product.html" class="nav-item"><i class="material-icons">add_circle_outline</i><p>Sell</p></a>
+        <a href="chats.html" class="nav-item"><i class="material-icons">chat</i><p>Chat</p></a>
+        <a href="profile.html" class="nav-item active"><i class="material-icons">person</i><p>Profile</p></a>
+    </div>
+
+<script>
+const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+let currentUserId = null;
+
+// 1. Authenticate & Load User Data
+async function initProfile() {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (!session) {
+        window.location.href = "index.html";
+        return;
+    }
+    
+    currentUserId = session.user.id;
+    document.getElementById('userEmail').innerText = session.user.email;
+
+    // Fetch Profile Name from 'profiles' table
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('full_name')
+        .eq('id', currentUserId)
+        .single();
+        
+    if (profile && profile.full_name) {
+        document.getElementById('userName').innerText = profile.full_name;
+    } else {
+        document.getElementById('userName').innerText = "Student";
+    }
+
+    // Load their items
+    fetchMyListings();
+}
+
+// 2. Fetch Only User's Items
+async function fetchMyListings() {
+    const container = document.getElementById('myListingsContainer');
+    
+    const { data: listings, error } = await supabaseClient
+        .from('listings')
+        .select('*')
+        .eq('seller_id', currentUserId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        container.innerHTML = `<p style="color: red; text-align: center;">Error loading items.</p>`;
+        return;
+    }
+
+    container.innerHTML = ''; // Clear loading
+
+    if (listings.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: #64748B; margin-top: 20px;">You haven't listed any items yet.</p>
+                               <button onclick="window.location.href='add-product.html'" style="display: block; margin: 20px auto; padding: 10px 20px; background: #14B8A6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Add Your First Item</button>`;
+        return;
+    }
+
+    listings.forEach(item => {
+        const isSold = item.status === 'Sold';
+        const statusClass = isSold ? 'status-sold' : 'status-available';
+        const imageSrc = item.image_url ? item.image_url : 'https://via.placeholder.com/70?text=No+Img';
+        
+        // Button text changes based on current status
+        const toggleSoldText = isSold ? 'Mark Available' : 'Mark Sold';
+        const toggleSoldIcon = isSold ? 'replay' : 'check_circle';
+
+        const cardHtml = `
+            <div class="inventory-card" id="item-${item.id}">
+                <div class="inventory-details">
+                    <img src="${imageSrc}" class="inventory-image" alt="Item">
+                    <div class="inventory-info">
+                        <div class="inventory-title">${item.title}</div>
+                        <div class="inventory-price">₹${item.price}</div>
+                        <div class="inventory-status ${statusClass}">${item.status}</div>
+                    </div>
+                </div>
+                <div class="inventory-actions">
+                    <button class="btn-action btn-mark-sold" onclick="toggleStatus('${item.id}', '${item.status}')">
+                        <i class="material-icons" style="font-size: 16px;">${toggleSoldIcon}</i> ${toggleSoldText}
+                    </button>
+                    <button class="btn-action btn-delete" onclick="deleteItem('${item.id}')">
+                        <i class="material-icons" style="font-size: 16px;">delete</i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
+        container.innerHTML += cardHtml;
+    });
+}
+
+// 3. Mark as Sold / Mark Available Logic
+async function toggleStatus(itemId, currentStatus) {
+    const newStatus = currentStatus === 'Available' ? 'Sold' : 'Available';
+    
+    const { error } = await supabaseClient
+        .from('listings')
+        .update({ status: newStatus })
+        .eq('id', itemId);
+
+    if (!error) {
+        fetchMyListings(); // Refresh the list
+    } else {
+        alert("Error updating status: " + error.message);
+    }
+}
+
+// 4. Delete Logic
+async function deleteItem(itemId) {
+    if(confirm("Are you sure you want to permanently delete this listing?")) {
+        const { error } = await supabaseClient
+            .from('listings')
+            .delete()
+            .eq('id', itemId);
+
+        if (!error) {
+            document.getElementById(`item-${itemId}`).remove(); // Remove from UI instantly
+        } else {
+            alert("Error deleting item: " + error.message);
+        }
+    }
+}
+
+// 5. Logout
+async function logout(){
+    await supabaseClient.auth.signOut();
+    window.location = "index.html";
+}
+
+// Run on load
+initProfile();
+</script>
+
+</body>
+</html>
