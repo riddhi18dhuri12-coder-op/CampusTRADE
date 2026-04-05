@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DormKart - Auth</title>
+<title>DormKart - Login / Signup</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -30,7 +29,7 @@ background:#F0FDFA;
 
 .container{
 width:850px;
-height:480px;
+height:500px;
 display:flex;
 background:white;
 border-radius:12px;
@@ -49,7 +48,7 @@ justify-content:center;
 }
 
 .left h1{
-font-size:42px;
+font-size:40px;
 margin-bottom:10px;
 }
 
@@ -64,7 +63,9 @@ padding:40px;
 
 .tabs{
 display:flex;
-margin-bottom:20px;
+margin-bottom:25px;
+border-radius:8px;
+overflow:hidden;
 }
 
 .tabs button{
@@ -76,7 +77,7 @@ cursor:pointer;
 font-size:15px;
 }
 
-.tabs .active{
+.tabs button.active{
 background:#14B8A6;
 color:white;
 }
@@ -137,7 +138,7 @@ margin-top:10px;
 <button id="signupTab">Sign Up</button>
 </div>
 
-<!-- LOGIN -->
+<!-- LOGIN FORM -->
 
 <div id="loginForm" class="form active">
 
@@ -151,7 +152,7 @@ margin-top:10px;
 
 </div>
 
-<!-- SIGNUP -->
+<!-- SIGNUP FORM -->
 
 <div id="signupForm" class="form">
 
@@ -170,13 +171,13 @@ margin-top:10px;
 
 <script>
 
-const loginTab = document.getElementById("loginTab")
-const signupTab = document.getElementById("signupTab")
+const loginTab=document.getElementById("loginTab")
+const signupTab=document.getElementById("signupTab")
 
-const loginForm = document.getElementById("loginForm")
-const signupForm = document.getElementById("signupForm")
+const loginForm=document.getElementById("loginForm")
+const signupForm=document.getElementById("signupForm")
 
-loginTab.onclick = () => {
+loginTab.onclick=()=>{
 
 loginTab.classList.add("active")
 signupTab.classList.remove("active")
@@ -186,7 +187,7 @@ signupForm.classList.remove("active")
 
 }
 
-signupTab.onclick = () => {
+signupTab.onclick=()=>{
 
 signupTab.classList.add("active")
 loginTab.classList.remove("active")
@@ -198,9 +199,10 @@ loginForm.classList.remove("active")
 
 async function signup(){
 
-const email = document.getElementById("signupEmail").value
-const password = document.getElementById("signupPassword").value
-const msg = document.getElementById("signupMsg")
+const email=document.getElementById("signupEmail").value
+const password=document.getElementById("signupPassword").value
+
+const msg=document.getElementById("signupMsg")
 
 if(!email || !password){
 
@@ -212,9 +214,9 @@ return
 
 msg.innerText="Creating account..."
 
-const { data, error } = await supabaseClient.auth.signUp({
-email: email,
-password: password
+const { data,error } = await supabaseClient.auth.signUp({
+email:email,
+password:password
 })
 
 if(error){
@@ -225,7 +227,7 @@ return
 
 }
 
-const user = data.user
+const user=data.user
 
 await supabaseClient
 .from("users")
@@ -235,7 +237,7 @@ email:user.email
 })
 
 msg.style.color="green"
-msg.innerText="Signup successful! Redirecting to profile..."
+msg.innerText="Signup successful! Redirecting..."
 
 setTimeout(()=>{
 window.location="profile.html"
@@ -245,9 +247,10 @@ window.location="profile.html"
 
 async function login(){
 
-const email = document.getElementById("loginEmail").value
-const password = document.getElementById("loginPassword").value
-const msg = document.getElementById("loginMsg")
+const email=document.getElementById("loginEmail").value
+const password=document.getElementById("loginPassword").value
+
+const msg=document.getElementById("loginMsg")
 
 if(!email || !password){
 
@@ -259,9 +262,9 @@ return
 
 msg.innerText="Logging in..."
 
-const { data, error } = await supabaseClient.auth.signInWithPassword({
-email: email,
-password: password
+const { data,error } = await supabaseClient.auth.signInWithPassword({
+email:email,
+password:password
 })
 
 if(error){
@@ -286,9 +289,7 @@ async function checkSession(){
 const { data } = await supabaseClient.auth.getSession()
 
 if(data.session){
-
 window.location="dashboard.html"
-
 }
 
 }
