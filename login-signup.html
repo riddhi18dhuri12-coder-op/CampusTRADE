@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DormKart - Login</title>
+
+<title>DormKart - Auth</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -46,7 +48,7 @@ justify-content:center;
 }
 
 .left h1{
-font-size:40px;
+font-size:42px;
 margin-bottom:10px;
 }
 
@@ -70,6 +72,7 @@ padding:12px;
 border:none;
 background:#eee;
 cursor:pointer;
+font-size:15px;
 }
 
 .tabs .active{
@@ -91,6 +94,7 @@ padding:12px;
 margin-bottom:15px;
 border:1px solid #ddd;
 border-radius:8px;
+font-size:14px;
 }
 
 button.submit{
@@ -100,6 +104,7 @@ background:#14B8A6;
 color:white;
 border-radius:8px;
 cursor:pointer;
+font-size:15px;
 }
 
 button.submit:hover{
@@ -112,6 +117,7 @@ margin-top:10px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -163,7 +169,9 @@ margin-top:10px;
 
 <script>
 
-const supabaseClient = supabase.createClient(
+const { createClient } = supabase
+
+const supabaseClient = createClient(
 SUPABASE_CONFIG.url,
 SUPABASE_CONFIG.key
 )
@@ -199,26 +207,37 @@ async function signup(){
 const email = document.getElementById("signupEmail").value
 const password = document.getElementById("signupPassword").value
 
+const msg = document.getElementById("signupMsg")
+
+if(!email || !password){
+
+msg.style.color="red"
+msg.innerText="Enter email and password"
+return
+
+}
+
+msg.innerText="Creating account..."
+
 const { data, error } = await supabaseClient.auth.signUp({
-email: email,
-password: password
+email:email,
+password:password
 })
 
 if(error){
 
-document.getElementById("signupMsg").innerText = error.message
+msg.style.color="red"
+msg.innerText=error.message
+return
 
 }
-else{
 
-document.getElementById("signupMsg").style.color="green"
-document.getElementById("signupMsg").innerText="Signup successful! Redirecting..."
+msg.style.color="green"
+msg.innerText="Signup successful! Redirecting..."
 
 setTimeout(()=>{
 window.location="dashboard.html"
-},1200)
-
-}
+},1500)
 
 }
 
@@ -227,20 +246,33 @@ async function login(){
 const email = document.getElementById("loginEmail").value
 const password = document.getElementById("loginPassword").value
 
+const msg = document.getElementById("loginMsg")
+
+if(!email || !password){
+
+msg.style.color="red"
+msg.innerText="Enter email and password"
+return
+
+}
+
+msg.innerText="Logging in..."
+
 const { data, error } = await supabaseClient.auth.signInWithPassword({
-email: email,
-password: password
+email:email,
+password:password
 })
 
 if(error){
 
-document.getElementById("loginMsg").innerText = error.message
+msg.style.color="red"
+msg.innerText=error.message
+return
 
 }
-else{
 
-document.getElementById("loginMsg").style.color="green"
-document.getElementById("loginMsg").innerText="Login successful! Redirecting..."
+msg.style.color="green"
+msg.innerText="Login successful!"
 
 setTimeout(()=>{
 window.location="dashboard.html"
@@ -248,7 +280,19 @@ window.location="dashboard.html"
 
 }
 
+async function checkSession(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(data.session){
+
+window.location="dashboard.html"
+
 }
+
+}
+
+checkSession()
 
 </script>
 
