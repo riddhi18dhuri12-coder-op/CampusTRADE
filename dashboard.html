@@ -1,577 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>DormKart Marketplace</title>
+    
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-<title>DormKart Marketplace</title>
+    <style>
+        /* GLOBAL */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui; }
+        body { background:#E6FFFA; padding-bottom: 80px; }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+        /* HEADER */
+        .header {
+            background:#14B8A6; color:white; height:60px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 16px; box-shadow:0 2px 8px rgba(0,0,0,0.15);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-weight:bold; font-size:20px; }
+        .notification { position:relative; cursor:pointer; }
+        .badge {
+            position:absolute; top:-5px; right:-5px; background:red;
+            color:white; font-size:10px; padding:3px 6px; border-radius:50%;
+        }
 
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        /* HERO & SEARCH */
+        .hero { text-align:center; padding:30px 10px; }
+        .hero h1 { font-size:28px; color: #0d9488; }
+        .search { padding:0 20px; margin-bottom:20px; }
+        .search input {
+            width:100%; padding:14px; border-radius:25px;
+            border:1px solid #ddd; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-<style>
+        /* FILTER */
+        .filters { display:flex; gap:10px; overflow:auto; padding:10px 20px; scrollbar-width: none; }
+        .filters::-webkit-scrollbar { display: none; }
+        .filters button {
+            padding:8px 18px; border:none; border-radius:20px;
+            background:white; cursor:pointer; white-space: nowrap; transition: 0.2s;
+        }
+        .filters .active { background:#14B8A6; color:white; font-weight: bold; }
 
-/* GLOBAL */
+        /* PRODUCTS GRID */
+        .grid {
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+            gap:14px; padding:20px;
+        }
+        .card {
+            background:white; border-radius:12px; overflow:hidden;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08); cursor:pointer;
+            display:flex; flex-direction:column; transition:.2s;
+        }
+        .card:hover { transform:translateY(-4px); }
+        .image { height:140px; background:#f3f4f6; display:flex; align-items:center; justify-content:center; }
+        .image img { width:100%; height:100%; object-fit:cover; }
+        .content { padding:12px; }
+        .title { font-size:14px; margin-bottom:5px; font-weight: 500; height: 38px; overflow: hidden; }
+        .price { font-weight:bold; color: #14B8A6; font-size: 16px; }
+        .meta { display:flex; justify-content:space-between; font-size:12px; margin-top:8px; color:#777; }
+        .seller { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:11px; border-top: 1px solid #eee; pt: 8px; }
+        .seller img { width:20px; height:20px; border-radius:50%; background: #ddd; }
+        .actions { display:flex; justify-content:space-between; margin-top:10px; }
+        .chat-btn {
+            background:#14B8A6; color:white; border:none;
+            padding:6px 12px; border-radius:6px; cursor:pointer; width: 100%; font-weight: bold;
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:system-ui;
-}
-
-body{
-background:#E6FFFA;
-}
-
-/* HEADER */
-
-.header{
-background:#14B8A6;
-color:white;
-height:60px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 16px;
-box-shadow:0 2px 8px rgba(0,0,0,0.15);
-}
-
-.logo{
-font-weight:bold;
-font-size:20px;
-}
-
-.notification{
-position:relative;
-cursor:pointer;
-}
-
-.badge{
-position:absolute;
-top:-5px;
-right:-5px;
-background:red;
-color:white;
-font-size:10px;
-padding:3px 6px;
-border-radius:50%;
-}
-
-/* HERO */
-
-.hero{
-text-align:center;
-padding:30px 10px;
-}
-
-.hero h1{
-font-size:28px;
-}
-
-/* SEARCH */
-
-.search{
-padding:0 20px;
-margin-bottom:20px;
-}
-
-.search input{
-width:100%;
-padding:12px;
-border-radius:25px;
-border:none;
-}
-
-/* FILTER */
-
-.filters{
-display:flex;
-gap:10px;
-overflow:auto;
-padding:10px 20px;
-}
-
-.filters button{
-padding:8px 14px;
-border:none;
-border-radius:20px;
-background:white;
-cursor:pointer;
-}
-
-.filters .active{
-background:#14B8A6;
-color:white;
-}
-
-/* PRODUCTS */
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-gap:14px;
-padding:20px;
-}
-
-.card{
-background:white;
-border-radius:12px;
-overflow:hidden;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);
-cursor:pointer;
-display:flex;
-flex-direction:column;
-transition:.2s;
-}
-
-.card:hover{
-transform:translateY(-4px);
-}
-
-.image{
-height:140px;
-background:#eee;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.image img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-
-.content{
-padding:10px;
-}
-
-.title{
-font-size:14px;
-margin-bottom:5px;
-}
-
-.price{
-font-weight:bold;
-}
-
-.meta{
-display:flex;
-justify-content:space-between;
-font-size:12px;
-margin-top:6px;
-color:#777;
-}
-
-.seller{
-display:flex;
-align-items:center;
-gap:6px;
-margin-top:6px;
-font-size:12px;
-}
-
-.seller img{
-width:22px;
-height:22px;
-border-radius:50%;
-}
-
-.actions{
-display:flex;
-justify-content:space-between;
-margin-top:8px;
-}
-
-.chat-btn{
-background:#14B8A6;
-color:white;
-border:none;
-padding:6px 10px;
-border-radius:6px;
-cursor:pointer;
-}
-
-.wishlist{
-cursor:pointer;
-}
-
-/* BOTTOM NAV */
-
-.bottom{
-position:fixed;
-bottom:0;
-width:100%;
-background:white;
-display:flex;
-justify-content:space-around;
-padding:8px;
-box-shadow:0 -2px 10px rgba(0,0,0,0.15);
-}
-
-.bottom div{
-text-align:center;
-color:#888;
-cursor:pointer;
-}
-
-.bottom .active{
-color:#14B8A6;
-}
-
-</style>
+        /* BOTTOM NAV */
+        .bottom {
+            position:fixed; bottom:0; width:100%; background:white;
+            display:flex; justify-content:space-around; padding:12px;
+            box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .bottom div { text-align:center; color:#888; cursor:pointer; }
+        .bottom .active { color:#14B8A6; }
+    </style>
 </head>
-
 <body>
 
 <div class="header">
-
-<div class="logo">DormKart</div>
-
-<div class="notification">
-<i class="material-icons">notifications</i>
-<span class="badge" id="notifCount">0</span>
-</div>
-
+    <div class="logo">DormKart</div>
+    <div class="notification">
+        <i class="material-icons">notifications</i>
+        <span class="badge" id="notifCount">0</span>
+    </div>
 </div>
 
 <div class="hero">
-<h1>Buy • Sell • Rent</h1>
-<p>Campus marketplace</p>
+    <h1>Buy • Sell • Rent</h1>
+    <p>The student-to-student marketplace</p>
 </div>
 
 <div class="search">
-<input id="searchInput" placeholder="Search products">
+    <input id="searchInput" type="text" placeholder="Search for books, tech, or furniture...">
 </div>
 
 <div class="filters">
-
-<button class="active" onclick="setCategory('All',this)">All</button>
-<button onclick="setCategory('Books',this)">Books</button>
-<button onclick="setCategory('Electronics',this)">Electronics</button>
-<button onclick="setCategory('Furniture',this)">Furniture</button>
-
+    <button class="active" onclick="setCategory('All',this)">All</button>
+    <button onclick="setCategory('Books',this)">Books</button>
+    <button onclick="setCategory('Electronics',this)">Electronics</button>
+    <button onclick="setCategory('Furniture',this)">Furniture</button>
+    <button onclick="setCategory('Other',this)">Other</button>
 </div>
 
 <div id="productGrid" class="grid">
-Loading marketplace...
+    <p style="grid-column: 1/-1; text-align: center; color: #666;">Loading marketplace...</p>
 </div>
 
 <div class="bottom">
-
-<div class="active" onclick="location.href='dashboard.html'">
-<i class="material-icons">home</i>
-</div>
-
-<div onclick="location.href='add-product.html'">
-<i class="material-icons">add_box</i>
-</div>
-
-<div onclick="location.href='swap.html'">
-<i class="material-icons">swap_horiz</i>
-</div>
-
-<div onclick="location.href='chats.html'">
-<i class="material-icons">chat</i>
-</div>
-
-<div onclick="location.href='profile.html'">
-<i class="material-icons">person</i>
-</div>
-
+    <div class="active" onclick="location.href='dashboard.html'"><i class="material-icons">home</i></div>
+    <div onclick="location.href='add-product.html'"><i class="material-icons">add_box</i></div>
+    <div onclick="location.href='swap.html'"><i class="material-icons">swap_horiz</i></div>
+    <div onclick="location.href='chats.html'"><i class="material-icons">chat</i></div>
+    <div onclick="location.href='profile.html'"><i class="material-icons">person</i></div>
 </div>
 
 <script>
-
-const supabaseClient=supabase.createClient(
-SUPABASE_CONFIG.url,
-SUPABASE_CONFIG.key
-)
-
-let currentUser=null
-let currentCategory="All"
-
-/* INIT */
-
-async function init(){
-
-const {data}=await supabaseClient.auth.getUser()
-
-currentUser=data.user
-
-if(!currentUser){
-location.href="index.html"
-}
-
-fetchProducts()
-loadNotifications()
-listenRealtime()
-
-}
-
-init()
-
-/* CATEGORY */
-
-function setCategory(cat,btn){
-
-document.querySelectorAll(".filters button")
-.forEach(b=>b.classList.remove("active"))
-
-btn.classList.add("active")
-
-currentCategory=cat
-
-fetchProducts()
-
-}
-
-/* FETCH PRODUCTS */
-
-async function fetchProducts(){
-
-const grid=document.getElementById("productGrid")
-
-grid.innerHTML="Loading..."
-
-let query=supabaseClient
-
-.from("products")
-
-.select(`
-*,
-users:seller_id(
-id,
-name,
-avatar_url
-)
-`)
-
-.eq("status","active")
-
-.order("views",{ascending:false})
-
-if(currentCategory!=="All"){
-query=query.eq("category",currentCategory)
-}
-
-const {data,error}=await query.limit(50)
-
-if(error){
-grid.innerHTML="Error loading"
-return
-}
-
-grid.innerHTML=""
-
-data.forEach(renderProduct)
-
-}
-
-/* RENDER CARD */
-
-function renderProduct(p){
-
-const grid=document.getElementById("productGrid")
-
-const seller=p.users
-
-const name=seller?.name || "Seller"
-
-const avatar=seller?.avatar_url || 
-`https://ui-avatars.com/api/?name=${name}`
-
-const isOwner=currentUser.id===seller?.id
-
-const chat=isOwner
-? `<span style="font-size:11px;color:#888">Your listing</span>`
-: `<button class="chat-btn" onclick="chat('${seller.id}','${p.id}',event)">Chat</button>`
-
-const html=`
-
-<div class="card" onclick="openProduct('${p.id}')">
-
-<div class="image">
-${p.image_url?`<img src="${p.image_url}">`:`<i class="material-icons">image</i>`}
-</div>
-
-<div class="content">
-
-<div class="title">${p.title}</div>
-
-<div class="price">₹${p.price}</div>
-
-<div class="meta">
-
-<span>👁 ${p.views}</span>
-
-<span class="wishlist" onclick="wishlist('${p.id}',event)">❤️</span>
-
-</div>
-
-<div class="seller">
-
-<img src="${avatar}">
-<span>${name}</span>
-
-</div>
-
-<div class="actions">
-
-${chat}
-
-</div>
-
-</div>
-
-</div>
-`
-
-grid.insertAdjacentHTML("beforeend",html)
-
-}
-
-/* PRODUCT PAGE */
-
-function openProduct(id){
-
-increaseViews(id)
-
-location.href=`product.html?id=${id}`
-
-}
-
-/* VIEW COUNT */
-
-async function increaseViews(id){
-
-await supabaseClient
-.from("products")
-.update({views:supabase.sql`views + 1`})
-.eq("id",id)
-
-}
-
-/* WISHLIST */
-
-async function wishlist(productId,event){
-
-event.stopPropagation()
-
-const {data}=await supabaseClient
-
-.from("wishlist")
-.select("*")
-.eq("user_id",currentUser.id)
-.eq("product_id",productId)
-
-if(data.length){
-
-await supabaseClient
-.from("wishlist")
-.delete()
-.eq("user_id",currentUser.id)
-.eq("product_id",productId)
-
-alert("Removed from wishlist")
-
-}else{
-
-await supabaseClient
-.from("wishlist")
-.insert({
-user_id:currentUser.id,
-product_id:productId
-})
-
-alert("Added to wishlist")
-
-}
-
-}
-
-/* CHAT */
-
-function chat(userId,productId,event){
-
-event.stopPropagation()
-
-location.href=`chat.html?user=${userId}&product=${productId}`
-
-}
-
-/* NOTIFICATIONS */
-
-async function loadNotifications(){
-
-const {data}=await supabaseClient
-
-.from("notifications")
-.select("*")
-.eq("user_id",currentUser.id)
-.eq("is_read",false)
-
-document.getElementById("notifCount").innerText=data.length
-
-}
-
-/* REALTIME */
-
-function listenRealtime(){
-
-supabaseClient
-
-.channel("notifications")
-
-.on(
-"postgres_changes",
-{
-event:"INSERT",
-schema:"public",
-table:"notifications"
-},
-payload=>{
-
-if(payload.new.user_id===currentUser.id){
-
-showToast(payload.new.title)
-
-loadNotifications()
-
-}
-
-})
-
-.subscribe()
-
-}
-
-/* TOAST */
-
-function showToast(msg){
-
-const div=document.createElement("div")
-
-div.innerText=msg
-
-div.style.position="fixed"
-div.style.bottom="90px"
-div.style.right="20px"
-div.style.background="#14B8A6"
-div.style.color="white"
-div.style.padding="10px"
-div.style.borderRadius="8px"
-
-document.body.appendChild(div)
-
-setTimeout(()=>div.remove(),4000)
-
-}
-
+    // Initialize Supabase
+    const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+
+    let currentUser = null;
+    let currentCategory = "All";
+
+    async function init() {
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
+        
+        if (error || !user) {
+            location.href = "index.html";
+            return;
+        }
+        
+        currentUser = user;
+        fetchProducts();
+        loadNotifications();
+        listenRealtime();
+
+        // Search listener
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            debounceSearch(e.target.value);
+        });
+    }
+
+    let searchTimeout;
+    function debounceSearch(val) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => fetchProducts(val), 500);
+    }
+
+    async function fetchProducts(searchTerm = "") {
+        const grid = document.getElementById("productGrid");
+        grid.innerHTML = "Loading...";
+
+        try {
+            // NOTE: Replace 'profiles' with whatever your public user info table is called
+            let query = supabaseClient
+                .from("products")
+                .select(`
+                    *,
+                    seller:seller_id(name, avatar_url)
+                `)
+                .eq("status", "active")
+                .order("created_at", { ascending: false });
+
+            if (currentCategory !== "All") {
+                query = query.eq("category", currentCategory);
+            }
+
+            if (searchTerm) {
+                query = query.ilike('title', `%${searchTerm}%`);
+            }
+
+            const { data, error } = await query.limit(40);
+
+            if (error) throw error;
+
+            if (data.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 20px;">No products found.</p>`;
+                return;
+            }
+
+            grid.innerHTML = "";
+            data.forEach(renderProduct);
+
+        } catch (err) {
+            console.error("Fetch Error:", err);
+            grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: red;">Error loading products. Check RLS policies.</p>`;
+        }
+    }
+
+    function setCategory(cat, btn) {
+        document.querySelectorAll(".filters button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = cat;
+        fetchProducts();
+    }
+
+    function renderProduct(p) {
+        const grid = document.getElementById("productGrid");
+        const sellerName = p.seller?.name || "Student Seller";
+        const avatar = p.seller?.avatar_url || `https://ui-avatars.com/api/?name=${sellerName}`;
+        const isOwner = currentUser.id === p.seller_id;
+
+        const actionHtml = isOwner 
+            ? `<div style="text-align:center; width:100%; font-size:11px; color:#888">Your listing</div>`
+            : `<button class="chat-btn" onclick="goToChat('${p.seller_id}','${p.id}', event)">Chat</button>`;
+
+        const html = `
+            <div class="card" onclick="location.href='product.html?id=${p.id}'">
+                <div class="image">
+                    ${p.image_url ? `<img src="${p.image_url}" alt="${p.title}">` : `<i class="material-icons" style="font-size:48px;color:#ccc">image</i>`}
+                </div>
+                <div class="content">
+                    <div class="title">${p.title}</div>
+                    <div class="price">₹${p.price}</div>
+                    <div class="meta">
+                        <span>👁 ${p.views || 0}</span>
+                        <span class="wishlist" onclick="toggleWishlist('${p.id}', event)">❤️</span>
+                    </div>
+                    <div class="seller">
+                        <img src="${avatar}">
+                        <span>${sellerName}</span>
+                    </div>
+                    <div class="actions">
+                        ${actionHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+        grid.insertAdjacentHTML("beforeend", html);
+    }
+
+    async function toggleWishlist(productId, event) {
+        event.stopPropagation();
+        // Simple alert for UI feedback; actual DB logic depends on your 'wishlist' table schema
+        alert("Wishlist feature coming soon!");
+    }
+
+    function goToChat(sellerId, productId, event) {
+        event.stopPropagation();
+        location.href = `chat.html?user=${sellerId}&product=${productId}`;
+    }
+
+    async function loadNotifications() {
+        try {
+            const { data } = await supabaseClient
+                .from("notifications")
+                .select("id")
+                .eq("user_id", currentUser.id)
+                .eq("is_read", false);
+            
+            document.getElementById("notifCount").innerText = data?.length || 0;
+        } catch (e) { console.log(e); }
+    }
+
+    function listenRealtime() {
+        supabaseClient
+            .channel("public:notifications")
+            .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, payload => {
+                if (payload.new.user_id === currentUser.id) {
+                    showToast(payload.new.title);
+                    loadNotifications();
+                }
+            })
+            .subscribe();
+    }
+
+    function showToast(msg) {
+        const div = document.createElement("div");
+        div.innerText = msg;
+        div.style.cssText = "position:fixed; bottom:90px; right:20px; background:#14B8A6; color:white; padding:12px 20px; border-radius:8px; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.2);";
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 4000);
+    }
+
+    // Run on load
+    init();
 </script>
 
 </body>
