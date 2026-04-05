@@ -6,56 +6,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DormKart Profile</title>
+<title>DormKart - Auth</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 
 <style>
 
-body{
-font-family:Segoe UI;
-background:#F0FDFA;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
 }
 
-.card{
+body{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#F0FDFA;
+}
+
+.container{
+width:850px;
+height:480px;
+display:flex;
 background:white;
-padding:40px;
 border-radius:12px;
-width:380px;
 box-shadow:0 10px 30px rgba(0,0,0,0.08);
-text-align:center;
+overflow:hidden;
 }
 
-h2{
+.left{
+flex:1;
+background:#14B8A6;
+color:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+.left h1{
+font-size:42px;
+margin-bottom:10px;
+}
+
+.left p{
+opacity:0.9;
+}
+
+.right{
+flex:1;
+padding:40px;
+}
+
+.tabs{
+display:flex;
 margin-bottom:20px;
 }
 
-img{
-width:110px;
-height:110px;
-border-radius:50%;
-object-fit:cover;
-margin-bottom:15px;
-border:3px solid #14B8A6;
+.tabs button{
+flex:1;
+padding:12px;
+border:none;
+background:#eee;
+cursor:pointer;
+font-size:15px;
+}
+
+.tabs .active{
+background:#14B8A6;
+color:white;
+}
+
+.form{
+display:none;
+flex-direction:column;
+}
+
+.form.active{
+display:flex;
 }
 
 input{
-width:100%;
 padding:12px;
-margin-bottom:12px;
-border-radius:8px;
+margin-bottom:15px;
 border:1px solid #ddd;
+border-radius:8px;
 font-size:14px;
 }
 
-button{
-width:100%;
+button.submit{
 padding:12px;
 border:none;
 background:#14B8A6;
@@ -65,18 +108,13 @@ cursor:pointer;
 font-size:15px;
 }
 
-button:hover{
+button.submit:hover{
 background:#0D9488;
 }
 
-.logout{
-margin-top:10px;
-background:#ef4444;
-}
-
-#msg{
-margin-top:10px;
+.message{
 font-size:14px;
+margin-top:10px;
 }
 
 </style>
@@ -85,138 +123,181 @@ font-size:14px;
 
 <body>
 
-<div class="card">
+<div class="container">
 
-<h2>DormKart Profile</h2>
+<div class="left">
+<h1>DormKart</h1>
+<p>Smart Campus Marketplace</p>
+</div>
 
-<img id="avatarPreview" src="https://via.placeholder.com/100">
+<div class="right">
 
-<input type="file" id="avatarFile">
+<div class="tabs">
+<button id="loginTab" class="active">Login</button>
+<button id="signupTab">Sign Up</button>
+</div>
 
-<input type="text" id="name" placeholder="Your Name">
+<!-- LOGIN -->
 
-<button onclick="saveProfile()">Save Profile</button>
+<div id="loginForm" class="form active">
 
-<button class="logout" onclick="logout()">Logout</button>
+<input type="email" id="loginEmail" placeholder="College Email">
 
-<p id="msg"></p>
+<input type="password" id="loginPassword" placeholder="Password">
 
+<button class="submit" onclick="login()">Login</button>
+
+<div id="loginMsg" class="message"></div>
+
+</div>
+
+<!-- SIGNUP -->
+
+<div id="signupForm" class="form">
+
+<input type="email" id="signupEmail" placeholder="College Email">
+
+<input type="password" id="signupPassword" placeholder="Password">
+
+<button class="submit" onclick="signup()">Create Account</button>
+
+<div id="signupMsg" class="message"></div>
+
+</div>
+
+</div>
 </div>
 
 <script>
 
-async function loadProfile(){
+const loginTab = document.getElementById("loginTab")
+const signupTab = document.getElementById("signupTab")
 
-const { data } = await supabaseClient.auth.getSession()
+const loginForm = document.getElementById("loginForm")
+const signupForm = document.getElementById("signupForm")
 
-if(!data.session){
-window.location="login.html"
+loginTab.onclick = () => {
+
+loginTab.classList.add("active")
+signupTab.classList.remove("active")
+
+loginForm.classList.add("active")
+signupForm.classList.remove("active")
+
+}
+
+signupTab.onclick = () => {
+
+signupTab.classList.add("active")
+loginTab.classList.remove("active")
+
+signupForm.classList.add("active")
+loginForm.classList.remove("active")
+
+}
+
+async function signup(){
+
+const email = document.getElementById("signupEmail").value
+const password = document.getElementById("signupPassword").value
+
+const msg = document.getElementById("signupMsg")
+
+if(!email || !password){
+
+msg.style.color="red"
+msg.innerText="Enter email and password"
 return
-}
-
-const user = data.session.user
-
-const { data:profile } = await supabaseClient
-.from("users")
-.select("*")
-.eq("id",user.id)
-.single()
-
-if(profile){
-
-document.getElementById("name").value = profile.name || ""
-
-if(profile.avatar_url){
-document.getElementById("avatarPreview").src = profile.avatar_url
-}
 
 }
 
-}
+msg.innerText="Creating account..."
 
-loadProfile()
-
-document.getElementById("avatarFile").addEventListener("change",function(){
-
-const file = this.files[0]
-
-if(file){
-
-document.getElementById("avatarPreview").src = URL.createObjectURL(file)
-
-}
-
+const { data, error } = await supabaseClient.auth.signUp({
+email: email,
+password: password
 })
-
-async function saveProfile(){
-
-const msg=document.getElementById("msg")
-
-const { data:sessionData } = await supabaseClient.auth.getSession()
-
-const user = sessionData.session.user
-
-const name = document.getElementById("name").value
-const file = document.getElementById("avatarFile").files[0]
-
-let avatarUrl = null
-
-if(file){
-
-msg.innerText="Uploading avatar..."
-
-const filePath = "avatars/" + user.id + "-" + Date.now()
-
-const { error } = await supabaseClient.storage
-.from("dormkart-assets")
-.upload(filePath,file)
 
 if(error){
 
+msg.style.color="red"
 msg.innerText=error.message
 return
 
 }
 
-avatarUrl = supabaseClient.storage
-.from("dormkart-assets")
-.getPublicUrl(filePath).data.publicUrl
+const user = data.user
 
-}
-
-msg.innerText="Saving profile..."
-
-const { error } = await supabaseClient
+await supabaseClient
 .from("users")
 .upsert({
 id:user.id,
-email:user.email,
-name:name,
-avatar_url:avatarUrl
+email:user.email
+})
+
+msg.style.color="green"
+msg.innerText="Signup successful!"
+
+setTimeout(()=>{
+window.location="profile.html"
+},1500)
+
+}
+
+async function login(){
+
+const email = document.getElementById("loginEmail").value
+const password = document.getElementById("loginPassword").value
+
+const msg = document.getElementById("loginMsg")
+
+if(!email || !password){
+
+msg.style.color="red"
+msg.innerText="Enter email and password"
+return
+
+}
+
+msg.innerText="Logging in..."
+
+const { data, error } = await supabaseClient.auth.signInWithPassword({
+email: email,
+password: password
 })
 
 if(error){
 
+msg.style.color="red"
 msg.innerText=error.message
 return
 
 }
 
 msg.style.color="green"
-msg.innerText="Profile saved successfully!"
+msg.innerText="Login successful!"
+
+setTimeout(()=>{
+window.location="dashboard.html"
+},1000)
 
 }
 
-async function logout(){
+async function checkSession(){
 
-await supabaseClient.auth.signOut()
+const { data } = await supabaseClient.auth.getSession()
 
-window.location="login-signup.html"
+if(data.session){
+
+window.location="dashboard.html"
 
 }
+
+}
+
+checkSession()
 
 </script>
 
 </body>
-
 </html>
