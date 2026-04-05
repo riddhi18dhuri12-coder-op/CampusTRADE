@@ -1,404 +1,586 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>List New Item | DormKart</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #14B8A6;
-            --primary-dark: #0D9488;
-            --primary-light: #F0FDFA;
-            --bg: #F8FAFC;
-            --card: #FFFFFF;
-            --text: #1E293B;
-            --text-light: #64748B;
-            --border: #E2E8F0;
-            --danger: #EF4444;
-            --success: #22C55E;
-        }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 100px; overflow-x: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-        /* Header */
-        header {
-            background: var(--card); padding: 16px 20px; display: flex; align-items: center;
-            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
-        }
-        header h1 { font-size: 18px; font-weight: 700; margin-left: 15px; flex: 1; }
-        .back-btn { color: var(--text); cursor: pointer; text-decoration: none; }
+<title>DormKart Marketplace</title>
 
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 
-        /* Image Upload Section */
-        .section-label { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: block; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .upload-box {
-            aspect-ratio: 1/1; border: 2px dashed var(--border); border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: var(--card); cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
-        }
-        .upload-box:active { transform: scale(0.95); background: var(--primary-light); border-color: var(--primary); }
-        .upload-box i { color: var(--text-light); font-size: 28px; }
-        .upload-box span { font-size: 10px; font-weight: 600; color: var(--text-light); margin-top: 5px; }
-        
-        .preview-img { width: 100%; height: 100%; object-fit: cover; }
-        .remove-img { 
-            position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); 
-            color: white; border-radius: 50%; padding: 2px; font-size: 16px; 
-        }
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-        /* Form Styling */
-        .input-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; position: relative; }
-        .form-group:last-child { margin-bottom: 0; }
-        
-        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
-        input, textarea, select {
-            width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);
-            font-size: 15px; outline: none; transition: 0.2s; background: var(--bg); color: var(--text);
-        }
-        input:focus, textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px var(--primary-light); }
+<style>
 
-        /* Condition Selector */
-        .condition-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .condition-btn {
-            padding: 10px; border-radius: 10px; border: 1px solid var(--border);
-            background: var(--bg); font-size: 13px; font-weight: 600; text-align: center; cursor: pointer;
-        }
-        .condition-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+/* GLOBAL */
 
-        /* AI Buttons */
-        .ai-action {
-            display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
-            color: var(--primary); margin-top: 8px; cursor: pointer; padding: 6px 12px;
-            background: var(--primary-light); border-radius: 20px; transition: 0.2s;
-        }
-        .ai-action:hover { background: var(--primary); color: white; }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:system-ui;
+}
 
-        /* Live Preview Card */
-        .preview-label { display: flex; justify-content: space-between; align-items: center; }
-        .live-card {
-            background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
-            display: flex; gap: 15px; padding: 12px; margin-bottom: 30px; animation: slideUp 0.5s ease;
-        }
-        .live-img { width: 80px; height: 80px; border-radius: 10px; background: var(--bg); object-fit: cover; }
-        .live-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .live-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-        .live-price { font-size: 16px; font-weight: 800; color: var(--primary); }
-        .live-cat { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; }
+body{
+background:#E6FFFA;
+}
 
-        /* Floating Button */
-        .fab-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px;
-            background: linear-gradient(transparent, var(--bg) 20%); z-index: 100;
-        }
-        .submit-btn {
-            background: var(--primary); color: white; border: none; width: 100%;
-            padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.4); cursor: pointer;
-        }
-        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+/* HEADER */
 
-        /* Progress Overlay */
-        .overlay {
-            position: fixed; inset: 0; background: rgba(255,255,255,0.9);
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000; backdrop-filter: blur(5px);
-        }
-        .progress-circle {
-            width: 60px; height: 60px; border: 5px solid var(--border);
-            border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        .progress-text { margin-top: 20px; font-weight: 700; color: var(--text); }
+.header{
+height:60px;
+background:#14B8A6;
+color:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 16px;
+box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.logo{
+font-weight:bold;
+font-size:20px;
+}
 
-        #success-anim { display: none; text-align: center; }
-        #success-anim i { font-size: 80px; color: var(--success); }
-    </style>
+.notification{
+position:relative;
+cursor:pointer;
+}
+
+.badge{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:white;
+font-size:10px;
+padding:3px 6px;
+border-radius:50%;
+}
+
+/* HERO */
+
+.hero{
+text-align:center;
+padding:30px 10px;
+}
+
+.hero h1{
+font-size:28px;
+}
+
+.hero p{
+color:#444;
+}
+
+/* SEARCH */
+
+.search{
+padding:0 20px;
+margin-bottom:20px;
+}
+
+.search input{
+width:100%;
+padding:12px;
+border-radius:25px;
+border:none;
+}
+
+/* PRODUCTS */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:14px;
+padding:20px;
+}
+
+.card{
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+cursor:pointer;
+display:flex;
+flex-direction:column;
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+}
+
+.image{
+height:140px;
+background:#eee;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.image img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.content{
+padding:10px;
+}
+
+.title{
+font-size:14px;
+margin-bottom:5px;
+}
+
+.price{
+font-weight:bold;
+}
+
+.meta{
+display:flex;
+justify-content:space-between;
+font-size:12px;
+margin-top:6px;
+color:#777;
+}
+
+.seller{
+display:flex;
+align-items:center;
+gap:6px;
+margin-top:6px;
+font-size:12px;
+}
+
+.seller img{
+width:22px;
+height:22px;
+border-radius:50%;
+}
+
+.actions{
+display:flex;
+justify-content:space-between;
+margin-top:8px;
+}
+
+.chat-btn{
+background:#14B8A6;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.wishlist{
+cursor:pointer;
+}
+
+/* BOTTOM NAV */
+
+.bottom{
+position:fixed;
+bottom:0;
+width:100%;
+background:white;
+display:flex;
+justify-content:space-around;
+padding:8px;
+box-shadow:0 -2px 10px rgba(0,0,0,0.15);
+}
+
+.bottom div{
+text-align:center;
+color:#888;
+cursor:pointer;
+}
+
+.bottom .active{
+color:#14B8A6;
+}
+
+</style>
+
 </head>
+
 <body>
 
-    <header>
-        <a href="dashboard.html" class="back-btn"><i class="material-icons">arrow_back</i></a>
-        <h1>List an Item</h1>
-        <i class="material-icons" style="color: var(--text-light)">help_outline</i>
-    </header>
+<div class="header">
 
-    <div class="container" id="main-content">
-        <span class="section-label">Photos (Up to 5)</span>
-        <div class="upload-grid" id="image-grid">
-            <div class="upload-box" onclick="document.getElementById('file-input').click()">
-                <i class="material-icons">add_a_photo</i>
-                <span>Add Photo</span>
-            </div>
-        </div>
-        <input type="file" id="file-input" hidden multiple accept="image/*" onchange="handleFileSelect(event)">
+<div class="logo">DormKart</div>
 
-        <div class="input-card">
-            <div class="form-group">
-                <label>Category</label>
-                <select id="category" onchange="updatePlaceholders(); syncPreview()">
-                    <option value="Books">Books</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Furniture">Furniture</option>
-                    <option value="Notes">Notes</option>
-                    <option value="Clothes">Clothes</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
+<div class="notification">
+<i class="material-icons">notifications</i>
+<span class="badge" id="notifCount">0</span>
+</div>
 
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="title" placeholder="Engineering Mechanics Book" oninput="syncPreview()">
-            </div>
+</div>
 
-            <div class="form-group">
-                <label>Price (₹)</label>
-                <input type="number" id="price" placeholder="500" oninput="syncPreview()">
-                <div class="ai-action" onclick="suggestPrice()">
-                    <i class="material-icons" style="font-size: 14px;">insights</i>
-                    Suggest Price
-                </div>
-            </div>
-        </div>
 
-        <div class="input-card">
-            <div class="form-group">
-                <label>Condition</label>
-                <div class="condition-grid">
-                    <div class="condition-btn active" onclick="setCondition(this, 'New')">New</div>
-                    <div class="condition-btn" onclick="setCondition(this, 'Like New')">Like New</div>
-                    <div class="condition-btn" onclick="setCondition(this, 'Used')">Used</div>
-                    <div class="condition-btn" onclick="setCondition(this, 'Refurbished')">Refurbished</div>
-                </div>
-            </div>
+<div class="hero">
 
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="description" rows="4" placeholder="Detailed description of your item..."></textarea>
-                <div class="ai-action" onclick="improveDescription()">
-                    <i class="material-icons" style="font-size: 14px;">auto_awesome</i>
-                    Improve Description
-                </div>
-            </div>
-        </div>
+<h1>Buy • Sell • Rent</h1>
+<p>Campus marketplace</p>
 
-        <div class="preview-label">
-            <span class="section-label">Live Preview</span>
-        </div>
-        <div class="live-card">
-            <img src="" id="pre-img" class="live-img">
-            <div class="live-info">
-                <span class="live-cat" id="pre-cat">BOOKS</span>
-                <div class="live-title" id="pre-title">Item Title</div>
-                <div class="live-price" id="pre-price">₹0</div>
-            </div>
-        </div>
-    </div>
+</div>
 
-    <div class="fab-container">
-        <button class="submit-btn" id="list-btn" onclick="listProduct()">
-            <i class="material-icons">rocket_launch</i>
-            List My Item
-        </button>
-    </div>
 
-    <div class="overlay" id="loading-overlay">
-        <div id="loader-content">
-            <div class="progress-circle"></div>
-            <div class="progress-text" id="status-msg">Preparing...</div>
-        </div>
-        <div id="success-anim">
-            <i class="material-icons">check_circle</i>
-            <h2 style="margin-top: 20px;">🎉 Product Listed!</h2>
-            <p style="color: var(--text-light); margin-top: 10px;">Redirecting to your dashboard...</p>
-        </div>
-    </div>
+<div class="search">
+<input placeholder="Search items">
+</div>
 
-    <script>
-        let uploadedFiles = [];
-        let selectedCondition = 'New';
 
-        // Draft Logic
-        window.onload = () => {
-            const draft = JSON.parse(localStorage.getItem('dormkart_draft'));
-            if (draft) {
-                document.getElementById('title').value = draft.title || '';
-                document.getElementById('price').value = draft.price || '';
-                document.getElementById('category').value = draft.category || 'Books';
-                document.getElementById('description').value = draft.description || '';
-                syncPreview();
-            }
-            autoSave();
-        };
+<div id="productGrid" class="grid">
 
-        function autoSave() {
-            setInterval(() => {
-                const draft = {
-                    title: document.getElementById('title').value,
-                    price: document.getElementById('price').value,
-                    category: document.getElementById('category').value,
-                    description: document.getElementById('description').value,
-                };
-                localStorage.setItem('dormkart_draft', JSON.stringify(draft));
-            }, 3000);
-        }
+Loading marketplace...
 
-        function handleFileSelect(e) {
-            const files = Array.from(e.target.files);
-            if (uploadedFiles.length + files.length > 5) {
-                alert("Max 5 images allowed");
-                return;
-            }
+</div>
 
-            files.forEach(file => {
-                uploadedFiles.push(file);
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const div = document.createElement('div');
-                    div.className = 'upload-box';
-                    div.innerHTML = `
-                        <img src="${event.target.result}" class="preview-img">
-                        <i class="material-icons remove-img" onclick="removeImg(this, ${uploadedFiles.length - 1})">close</i>
-                    `;
-                    document.getElementById('image-grid').insertBefore(div, document.getElementById('image-grid').firstChild);
-                    document.getElementById('pre-img').src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
 
-        function removeImg(btn, index) {
-            btn.parentElement.remove();
-            uploadedFiles.splice(index, 1);
-        }
+<div class="bottom">
 
-        function setCondition(btn, val) {
-            document.querySelectorAll('.condition-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedCondition = val;
-        }
+<div class="active" onclick="location.href='dashboard.html'">
+<i class="material-icons">home</i>
+</div>
 
-        function syncPreview() {
-            document.getElementById('pre-title').innerText = document.getElementById('title').value || "Item Title";
-            document.getElementById('pre-price').innerText = "₹" + (document.getElementById('price').value || "0");
-            document.getElementById('pre-cat').innerText = document.getElementById('category').value.toUpperCase();
-        }
+<div onclick="location.href='add-product.html'">
+<i class="material-icons">add_box</i>
+</div>
 
-        function updatePlaceholders() {
-            const cat = document.getElementById('category').value;
-            const placeholders = {
-                Books: "Engineering Mechanics Book",
-                Electronics: "Casio Calculator fx-991EX",
-                Furniture: "Study Table (Wooden)",
-                Notes: "Semester 3 Maths Notes",
-                Clothes: "Lab Coat (XL)",
-                Other: "Item name..."
-            };
-            document.getElementById('title').placeholder = placeholders[cat];
-        }
+<div onclick="location.href='swap.html'">
+<i class="material-icons">swap_horiz</i>
+</div>
 
-        async function suggestPrice() {
-            const title = document.getElementById('title').value;
-            if(!title) return alert("Enter title first");
-            
-            const { data } = await supabaseClient.from('products').select('price').ilike('title', `%${title}%`).limit(5);
-            if(data && data.length > 0) {
-                const avg = data.reduce((acc, curr) => acc + curr.price, 0) / data.length;
-                document.getElementById('price').value = Math.round(avg);
-                syncPreview();
-            } else {
-                alert("No similar items found for price suggestion.");
-            }
-        }
+<div onclick="location.href='chats.html'">
+<i class="material-icons">chat</i>
+</div>
 
-        function improveDescription() {
-            const desc = document.getElementById('description');
-            const title = document.getElementById('title').value;
-            if(!desc.value) return;
-            desc.value = `${title} in ${selectedCondition} condition. Well-maintained and ready for use. Feel free to contact for more details.`;
-        }
+<div onclick="location.href='profile.html'">
+<i class="material-icons">person</i>
+</div>
 
-        async function listProduct() {
-            const title = document.getElementById('title').value;
-            const price = document.getElementById('price').value;
-            const category = document.getElementById('category').value;
-            const description = document.getElementById('description').value;
+</div>
 
-            if(!title || !price || uploadedFiles.length === 0) {
-                alert("Please add at least one photo, title and price.");
-                return;
-            }
 
-            const overlay = document.getElementById('loading-overlay');
-            const status = document.getElementById('status-msg');
-            overlay.style.display = 'flex';
+<script>
 
-            try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if(!user) throw new Error("Please login first");
+/* SUPABASE */
 
-                let mainImageUrl = '';
-                
-                // Upload Loop
-                for(let i=0; i < uploadedFiles.length; i++) {
-                    status.innerText = `Uploading image ${i+1} of ${uploadedFiles.length}...`;
-                    const file = uploadedFiles[i];
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Math.random()}.${fileExt}`;
-                    const filePath = `${user.id}/${fileName}`;
+const supabaseClient = supabase.createClient(
+SUPABASE_CONFIG.url,
+SUPABASE_CONFIG.key
+);
 
-                    const { error: uploadError } = await supabaseClient.storage
-                        .from('product-images')
-                        .upload(filePath, file);
+let currentUser=null;
 
-                    if (uploadError) throw uploadError;
+/* AUTH CHECK */
 
-                    if(i === 0) {
-                        const { data } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
-                        mainImageUrl = data.publicUrl;
-                    }
-                }
+async function init(){
 
-                status.innerText = "Finalizing listing...";
+const {data} = await supabaseClient.auth.getUser();
 
-                const { error: insertError } = await supabaseClient.from('products').insert([{
-                    seller_id: user.id,
-                    title,
-                    description,
-                    price: parseInt(price),
-                    category,
-                    condition: selectedCondition,
-                    image_url: mainImageUrl,
-                    status: 'available',
-                    views: 0
-                }]);
+currentUser=data.user;
 
-                if (insertError) throw insertError;
+if(!currentUser){
 
-                localStorage.removeItem('dormkart_draft');
-                document.getElementById('loader-content').style.display = 'none';
-                document.getElementById('success-anim').style.display = 'block';
+location.href="index.html";
 
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
+}
 
-            } catch (err) {
-                overlay.style.display = 'none';
-                alert(err.message);
-            }
-        }
-    </script>
+fetchProducts();
+
+loadNotifications();
+
+listenRealtime();
+
+}
+
+init();
+
+
+/* FETCH PRODUCTS */
+
+async function fetchProducts(){
+
+const container=document.getElementById("productGrid");
+
+container.innerHTML="Loading...";
+
+const {data,error}=await supabaseClient
+
+.from("products")
+
+.select(`
+*,
+users:seller_id(
+id,
+name,
+avatar_url
+)
+`)
+
+.eq("status","active")
+
+.order("views",{ascending:false})
+
+.limit(40);
+
+if(error){
+
+container.innerHTML="Error loading products";
+
+return;
+
+}
+
+container.innerHTML="";
+
+data.forEach(product=>{
+
+renderProduct(product);
+
+});
+
+}
+
+
+/* RENDER PRODUCT */
+
+function renderProduct(p){
+
+const grid=document.getElementById("productGrid");
+
+const seller=p.users;
+
+const sellerName=seller?.name || "Seller";
+
+const avatar=seller?.avatar_url || `https://ui-avatars.com/api/?name=${sellerName}`;
+
+const isOwner=currentUser.id===seller?.id;
+
+const chatButton=isOwner
+? `<span style="font-size:11px;color:#888">Your Listing</span>`
+: `<button class="chat-btn" onclick="chat('${seller.id}','${p.id}',event)">Chat</button>`;
+
+const html=`
+
+<div class="card" onclick="openProduct('${p.id}')">
+
+<div class="image">
+${p.image_url ? `<img src="${p.image_url}">` : `<i class="material-icons">image</i>`}
+</div>
+
+<div class="content">
+
+<div class="title">${p.title}</div>
+
+<div class="price">₹${p.price}</div>
+
+<div class="meta">
+
+<span>👁 ${p.views}</span>
+
+<span class="wishlist" onclick="wishlist('${p.id}',event)">❤️</span>
+
+</div>
+
+<div class="seller">
+
+<img src="${avatar}">
+
+<span>${sellerName}</span>
+
+</div>
+
+<div class="actions">
+
+${chatButton}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+grid.insertAdjacentHTML("beforeend",html);
+
+}
+
+
+/* PRODUCT PAGE */
+
+function openProduct(id){
+
+increaseViews(id);
+
+location.href=`product.html?id=${id}`;
+
+}
+
+
+/* VIEW COUNTER */
+
+async function increaseViews(id){
+
+await supabaseClient
+
+.from("products")
+
+.update({views: supabase.sql`views + 1`})
+
+.eq("id",id);
+
+}
+
+
+/* WISHLIST */
+
+async function wishlist(productId,event){
+
+event.stopPropagation();
+
+const {data}=await supabaseClient
+
+.from("wishlist")
+
+.select("*")
+
+.eq("user_id",currentUser.id)
+
+.eq("product_id",productId);
+
+if(data.length){
+
+await supabaseClient
+
+.from("wishlist")
+
+.delete()
+
+.eq("user_id",currentUser.id)
+
+.eq("product_id",productId);
+
+alert("Removed from wishlist");
+
+}else{
+
+await supabaseClient
+
+.from("wishlist")
+
+.insert({
+
+user_id:currentUser.id,
+
+product_id:productId
+
+});
+
+alert("Added to wishlist");
+
+}
+
+}
+
+
+/* CHAT */
+
+function chat(userId,productId,event){
+
+event.stopPropagation();
+
+location.href=`chat.html?user=${userId}&product=${productId}`;
+
+}
+
+
+/* NOTIFICATIONS */
+
+async function loadNotifications(){
+
+const {data}=await supabaseClient
+
+.from("notifications")
+
+.select("*")
+
+.eq("user_id",currentUser.id)
+
+.eq("is_read",false);
+
+document.getElementById("notifCount").innerText=data.length;
+
+}
+
+
+/* REALTIME */
+
+function listenRealtime(){
+
+supabaseClient
+
+.channel("notifications")
+
+.on(
+
+"postgres_changes",
+
+{event:"INSERT",schema:"public",table:"notifications"},
+
+payload=>{
+
+const n=payload.new;
+
+if(n.user_id===currentUser.id){
+
+showToast(n.title);
+
+loadNotifications();
+
+}
+
+}
+
+)
+
+.subscribe();
+
+}
+
+
+/* TOAST */
+
+function showToast(msg){
+
+const div=document.createElement("div");
+
+div.innerText=msg;
+
+div.style.position="fixed";
+div.style.bottom="90px";
+div.style.right="20px";
+div.style.background="#14B8A6";
+div.style.color="white";
+div.style.padding="10px";
+div.style.borderRadius="8px";
+
+document.body.appendChild(div);
+
+setTimeout(()=>div.remove(),4000);
+
+}
+
+</script>
+
 </body>
 </html>
