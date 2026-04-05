@@ -200,7 +200,6 @@ async function signup(){
 
 const email = document.getElementById("signupEmail").value
 const password = document.getElementById("signupPassword").value
-
 const msg = document.getElementById("signupMsg")
 
 if(!email || !password){
@@ -236,7 +235,7 @@ email:user.email
 })
 
 msg.style.color="green"
-msg.innerText="Signup successful!"
+msg.innerText="Signup successful! Redirecting to profile..."
 
 setTimeout(()=>{
 window.location="profile.html"
@@ -248,7 +247,6 @@ async function login(){
 
 const email = document.getElementById("loginEmail").value
 const password = document.getElementById("loginPassword").value
-
 const msg = document.getElementById("loginMsg")
 
 if(!email || !password){
@@ -275,7 +273,7 @@ return
 }
 
 msg.style.color="green"
-msg.innerText="Login successful!"
+msg.innerText="Login successful! Redirecting..."
 
 setTimeout(()=>{
 window.location="dashboard.html"
