@@ -1,387 +1,578 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DormKart Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>DormKart Marketplace</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
-/* CSS Reset and Global Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    -webkit-tap-highlight-color: transparent;
+
+/* GLOBAL */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:system-ui;
 }
 
-body {
-    background: #E6FFFA;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+body{
+background:#E6FFFA;
 }
 
-/* Header (App Bar) */
-.header {
-    background: #14B8A6;
-    color: white;
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+/* HEADER */
+
+.header{
+background:#14B8A6;
+color:white;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 16px;
+box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
 
-.hamburger-menu, .notifications-container { cursor: pointer; }
-.notifications-container { position: relative; }
-.notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #EF4444;
-    color: white;
-    font-size: 10px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+.logo{
+font-weight:bold;
+font-size:20px;
 }
 
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: bold;
-    font-size: 1.2rem;
+.notification{
+position:relative;
+cursor:pointer;
 }
 
-.logo-icon { width: 24px; height: 24px; }
-
-/* Hero Section */
-.hero { text-align: center; padding: 40px 20px; }
-.hero h1 { font-size: 2.2rem; color: #111; margin-bottom: 8px; }
-.hero p { font-size: 1.2rem; color: #555; }
-
-/* Search Bar */
-.search-container {
-    padding: 0 20px;
-    margin-bottom: 24px;
-    position: relative;
-}
-.search-input {
-    width: 100%;
-    padding: 14px 44px;
-    border: 1px solid #ddd;
-    border-radius: 30px;
-    font-size: 1rem;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.search-icon, .qr-icon {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-}
-.search-icon { left: 32px; }
-.qr-icon { right: 32px; cursor: pointer; }
-
-/* Filter Buttons */
-.filter-buttons-container {
-    display: flex;
-    gap: 12px;
-    padding: 0 20px;
-    margin-bottom: 30px;
-    overflow-x: auto;
-}
-.filter-buttons-container::-webkit-scrollbar { display: none; }
-
-.filter-btn {
-    padding: 10px 20px;
-    border-radius: 30px;
-    border: 1px solid #ddd;
-    background: white;
-    color: #555;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-.filter-btn.active {
-    background: #14B8A6;
-    color: white;
-    border-color: #14B8A6;
-    box-shadow: 0 4px 10px rgba(20, 184, 166, 0.3);
+.badge{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:white;
+font-size:10px;
+padding:3px 6px;
+border-radius:50%;
 }
 
-/* Sections Global Styling */
-.section { padding: 0 20px; margin-bottom: 30px; }
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.section-header .section-title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #14B8A6;
-}
-.section-header h2 { font-size: 1.4rem; color: #222; }
+/* HERO */
 
-/* Product Grid */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+.hero{
+text-align:center;
+padding:30px 10px;
 }
 
-.product-card {
-    background: white;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s;
-    display: flex;
-    flex-direction: column;
-}
-.product-card:hover { transform: translateY(-5px); }
-
-.discount-badge {
-    position: absolute;
-    top: -8px;
-    left: 8px;
-    background: #EF4444;
-    color: white;
-    padding: 4px 8px;
-    font-size: 10px;
-    font-weight: bold;
-    border-radius: 12px;
-    z-index: 10;
+.hero h1{
+font-size:28px;
 }
 
-.product-image-container {
-    width: 100%;
-    height: 120px;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 10px;
-    background: #F1F1F1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.product-image-container img { width: 100%; height: 100%; object-fit: cover; }
+/* SEARCH */
 
-.product-title {
-    font-size: 0.95rem;
-    color: #333;
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.search{
+padding:0 20px;
+margin-bottom:20px;
 }
 
-.price-container { display: flex; gap: 8px; align-items: center; margin-top: auto; }
-.current-price { font-weight: bold; font-size: 1.1rem; color: #111; }
-.original-price { text-decoration: line-through; color: #999; font-size: 0.8rem; }
-
-/* Curated Bundles */
-.bundle-banner {
-    background: linear-gradient(to right, #2D3748, #CB7C6C);
-    color: white;
-    padding: 24px;
-    border-radius: 12px;
-    position: relative;
-}
-.seniors-tag {
-    background: rgba(255, 255, 255, 0.15);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    display: inline-block;
+.search input{
+width:100%;
+padding:12px;
+border-radius:25px;
+border:none;
 }
 
-/* Bottom Navigation */
-.bottom-nav {
-    background: white;
-    padding: 10px 0;
-    display: flex;
-    justify-content: space-around;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-    z-index: 100;
-}
-.nav-item {
-    text-align: center;
-    color: #888;
-    cursor: pointer;
-    transition: color 0.2s;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.nav-item.active { color: #14B8A6; }
-.nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
-.nav-item p { font-size: 0.8rem; }
+/* FILTER */
 
-.main-content { padding-bottom: 80px; }
+.filters{
+display:flex;
+gap:10px;
+overflow:auto;
+padding:10px 20px;
+}
+
+.filters button{
+padding:8px 14px;
+border:none;
+border-radius:20px;
+background:white;
+cursor:pointer;
+}
+
+.filters .active{
+background:#14B8A6;
+color:white;
+}
+
+/* PRODUCTS */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:14px;
+padding:20px;
+}
+
+.card{
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+cursor:pointer;
+display:flex;
+flex-direction:column;
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+}
+
+.image{
+height:140px;
+background:#eee;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.image img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.content{
+padding:10px;
+}
+
+.title{
+font-size:14px;
+margin-bottom:5px;
+}
+
+.price{
+font-weight:bold;
+}
+
+.meta{
+display:flex;
+justify-content:space-between;
+font-size:12px;
+margin-top:6px;
+color:#777;
+}
+
+.seller{
+display:flex;
+align-items:center;
+gap:6px;
+margin-top:6px;
+font-size:12px;
+}
+
+.seller img{
+width:22px;
+height:22px;
+border-radius:50%;
+}
+
+.actions{
+display:flex;
+justify-content:space-between;
+margin-top:8px;
+}
+
+.chat-btn{
+background:#14B8A6;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.wishlist{
+cursor:pointer;
+}
+
+/* BOTTOM NAV */
+
+.bottom{
+position:fixed;
+bottom:0;
+width:100%;
+background:white;
+display:flex;
+justify-content:space-around;
+padding:8px;
+box-shadow:0 -2px 10px rgba(0,0,0,0.15);
+}
+
+.bottom div{
+text-align:center;
+color:#888;
+cursor:pointer;
+}
+
+.bottom .active{
+color:#14B8A6;
+}
+
 </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <div class="hamburger-menu"><i class="material-icons">menu</i></div>
-        <div class="logo-container">
-            <svg class="logo-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M17,11V15H7V11H17M19,9H5V17H19V9Z" />
-                <path fill="white" d="M19,9H5V17H19V9Z" />
-                <path fill="#14B8A6" d="M17,11H7V15H17V11Z"/>
-            </svg>
-            <span>DormKart</span>
-        </div>
-        <div class="notifications-container">
-            <i class="material-icons">notifications_active</i>
-            <span class="notification-badge">1</span>
-        </div>
-    </div>
+<div class="header">
 
-    <div class="main-content">
-        <div class="hero">
-            <h1>Buy, Sell, Rent</h1>
-            <p>within Your Campus</p>
-        </div>
+<div class="logo">DormKart</div>
 
-        <div class="search-container">
-            <i class="material-icons search-icon">search</i>
-            <input type="text" class="search-input" placeholder="Search for books, electronics...">
-            <i class="material-icons qr-icon">qr_code_scanner</i>
-        </div>
+<div class="notification">
+<i class="material-icons">notifications</i>
+<span class="badge" id="notifCount">0</span>
+</div>
 
-        <div class="filter-buttons-container">
-            <button class="filter-btn active" onclick="filterListings('All', this)">All</button>
-            <button class="filter-btn" onclick="filterListings('Buy/Sell', this)">Buy/Sell</button>
-            <button class="filter-btn" onclick="filterListings('Rent', this)">Rent</button>
-            <button class="filter-btn" onclick="filterListings('Swap', this)">Swap</button>
-        </div>
+</div>
 
-        <div class="section flash-deals-section">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <i class="material-icons">flash_on</i>
-                    <h2>Marketplace</h2>
-                </div>
-            </div>
+<div class="hero">
+<h1>Buy • Sell • Rent</h1>
+<p>Campus marketplace</p>
+</div>
 
-            <div class="product-grid" id="products-container">
-                <p style="grid-column: 1 / -1; text-align: center; color: #999;">Loading marketplace...</p>
-            </div>
-        </div>
-    </div>
+<div class="search">
+<input id="searchInput" placeholder="Search products">
+</div>
 
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="window.location.href='dashboard.html'">
-            <i class="material-icons">home</i><p>Home</p>
-        </div>
-        <div class="nav-item" onclick="window.location.href='add-product.html'">
-            <i class="material-icons">add_box</i><p>List Item</p>
-        </div>
-        <div class="nav-item" onclick="window.location.href='swap.html'">
-            <i class="material-icons">swap_horiz</i><p>Swap</p>
-        </div>
-        <div class="nav-item" onclick="window.location.href='chats.html'">
-            <i class="material-icons">chat</i><p>Chat</p>
-        </div>
-        <div class="nav-item" onclick="window.location.href='profile.html'">
-            <i class="material-icons">person</i><p>Profile</p>
-        </div>
-    </div>
+<div class="filters">
+
+<button class="active" onclick="setCategory('All',this)">All</button>
+<button onclick="setCategory('Books',this)">Books</button>
+<button onclick="setCategory('Electronics',this)">Electronics</button>
+<button onclick="setCategory('Furniture',this)">Furniture</button>
+
+</div>
+
+<div id="productGrid" class="grid">
+Loading marketplace...
+</div>
+
+<div class="bottom">
+
+<div class="active" onclick="location.href='dashboard.html'">
+<i class="material-icons">home</i>
+</div>
+
+<div onclick="location.href='add-product.html'">
+<i class="material-icons">add_box</i>
+</div>
+
+<div onclick="location.href='swap.html'">
+<i class="material-icons">swap_horiz</i>
+</div>
+
+<div onclick="location.href='chats.html'">
+<i class="material-icons">chat</i>
+</div>
+
+<div onclick="location.href='profile.html'">
+<i class="material-icons">person</i>
+</div>
+
+</div>
+
 <script>
-const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
 
-async function checkUser(){
-    const { data } = await supabaseClient.auth.getSession();
-    if(!data.session) window.location="index.html";
+const supabaseClient=supabase.createClient(
+SUPABASE_CONFIG.url,
+SUPABASE_CONFIG.key
+)
+
+let currentUser=null
+let currentCategory="All"
+
+/* INIT */
+
+async function init(){
+
+const {data}=await supabaseClient.auth.getUser()
+
+currentUser=data.user
+
+if(!currentUser){
+location.href="index.html"
 }
-checkUser();
 
-let currentCategory = 'All';
+fetchProducts()
+loadNotifications()
+listenRealtime()
 
-function filterListings(category, btnElement) {
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    btnElement.classList.add('active');
-    currentCategory = category;
-    fetchListings();
 }
 
-async function fetchListings() {
-    const productsContainer = document.getElementById('products-container');
-    productsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #999;">Loading items...</p>`;
-    
-    try {
-        // CHANGED: 'listings' is now 'products'
-        let query = supabaseClient.from('products').select('*').eq('status', 'Available').order('created_at', { ascending: false });
-        if (currentCategory !== 'All') query = query.eq('category', currentCategory);
+init()
 
-        const { data: listings, error } = await query;
-        if (error) throw error;
+/* CATEGORY */
 
-        productsContainer.innerHTML = '';
+function setCategory(cat,btn){
 
-        if (!listings || listings.length === 0) {
-            productsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #64748B; padding: 20px;">No ${currentCategory !== 'All' ? currentCategory : ''} items available right now.</p>`;
-            return;
-        }
+document.querySelectorAll(".filters button")
+.forEach(b=>b.classList.remove("active"))
 
-        listings.forEach(item => {
-            let discountBadge = '';
-            if (item.original_price && item.original_price > item.price) {
-                const discount = Math.round(((item.original_price - item.price) / item.original_price) * 100);
-                discountBadge = `<span class="discount-badge">-${discount}% OFF</span>`;
-            }
+btn.classList.add("active")
 
-            const imageHtml = item.image_url ? `<img src="${item.image_url}" alt="${item.title}">` : `<i class="material-icons" style="font-size: 40px; color: #ccc;">image_not_supported</i>`;
-            const originalPriceHtml = (item.original_price && item.original_price > item.price) ? `<span class="original-price"><s>₹${item.original_price}</s></span>` : ``;
+currentCategory=cat
 
-            const cardHtml = `
-                <div class="product-card" onclick="window.location.href='product.html?id=${item.id}'">
-                    ${discountBadge}
-                    <div class="product-image-container">${imageHtml}</div>
-                    <h3 class="product-title" title="${item.title}">${item.title}</h3>
-                    <div class="price-container">
-                        <span class="current-price">₹${item.price}</span>
-                        ${originalPriceHtml}
-                    </div>
-                </div>
-            `;
-            productsContainer.innerHTML += cardHtml;
-        });
+fetchProducts()
 
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        productsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #EF4444;">Failed to load items.</p>`;
-    }
 }
-fetchListings();
+
+/* FETCH PRODUCTS */
+
+async function fetchProducts(){
+
+const grid=document.getElementById("productGrid")
+
+grid.innerHTML="Loading..."
+
+let query=supabaseClient
+
+.from("products")
+
+.select(`
+*,
+users:seller_id(
+id,
+name,
+avatar_url
+)
+`)
+
+.eq("status","active")
+
+.order("views",{ascending:false})
+
+if(currentCategory!=="All"){
+query=query.eq("category",currentCategory)
+}
+
+const {data,error}=await query.limit(50)
+
+if(error){
+grid.innerHTML="Error loading"
+return
+}
+
+grid.innerHTML=""
+
+data.forEach(renderProduct)
+
+}
+
+/* RENDER CARD */
+
+function renderProduct(p){
+
+const grid=document.getElementById("productGrid")
+
+const seller=p.users
+
+const name=seller?.name || "Seller"
+
+const avatar=seller?.avatar_url || 
+`https://ui-avatars.com/api/?name=${name}`
+
+const isOwner=currentUser.id===seller?.id
+
+const chat=isOwner
+? `<span style="font-size:11px;color:#888">Your listing</span>`
+: `<button class="chat-btn" onclick="chat('${seller.id}','${p.id}',event)">Chat</button>`
+
+const html=`
+
+<div class="card" onclick="openProduct('${p.id}')">
+
+<div class="image">
+${p.image_url?`<img src="${p.image_url}">`:`<i class="material-icons">image</i>`}
+</div>
+
+<div class="content">
+
+<div class="title">${p.title}</div>
+
+<div class="price">₹${p.price}</div>
+
+<div class="meta">
+
+<span>👁 ${p.views}</span>
+
+<span class="wishlist" onclick="wishlist('${p.id}',event)">❤️</span>
+
+</div>
+
+<div class="seller">
+
+<img src="${avatar}">
+<span>${name}</span>
+
+</div>
+
+<div class="actions">
+
+${chat}
+
+</div>
+
+</div>
+
+</div>
+`
+
+grid.insertAdjacentHTML("beforeend",html)
+
+}
+
+/* PRODUCT PAGE */
+
+function openProduct(id){
+
+increaseViews(id)
+
+location.href=`product.html?id=${id}`
+
+}
+
+/* VIEW COUNT */
+
+async function increaseViews(id){
+
+await supabaseClient
+.from("products")
+.update({views:supabase.sql`views + 1`})
+.eq("id",id)
+
+}
+
+/* WISHLIST */
+
+async function wishlist(productId,event){
+
+event.stopPropagation()
+
+const {data}=await supabaseClient
+
+.from("wishlist")
+.select("*")
+.eq("user_id",currentUser.id)
+.eq("product_id",productId)
+
+if(data.length){
+
+await supabaseClient
+.from("wishlist")
+.delete()
+.eq("user_id",currentUser.id)
+.eq("product_id",productId)
+
+alert("Removed from wishlist")
+
+}else{
+
+await supabaseClient
+.from("wishlist")
+.insert({
+user_id:currentUser.id,
+product_id:productId
+})
+
+alert("Added to wishlist")
+
+}
+
+}
+
+/* CHAT */
+
+function chat(userId,productId,event){
+
+event.stopPropagation()
+
+location.href=`chat.html?user=${userId}&product=${productId}`
+
+}
+
+/* NOTIFICATIONS */
+
+async function loadNotifications(){
+
+const {data}=await supabaseClient
+
+.from("notifications")
+.select("*")
+.eq("user_id",currentUser.id)
+.eq("is_read",false)
+
+document.getElementById("notifCount").innerText=data.length
+
+}
+
+/* REALTIME */
+
+function listenRealtime(){
+
+supabaseClient
+
+.channel("notifications")
+
+.on(
+"postgres_changes",
+{
+event:"INSERT",
+schema:"public",
+table:"notifications"
+},
+payload=>{
+
+if(payload.new.user_id===currentUser.id){
+
+showToast(payload.new.title)
+
+loadNotifications()
+
+}
+
+})
+
+.subscribe()
+
+}
+
+/* TOAST */
+
+function showToast(msg){
+
+const div=document.createElement("div")
+
+div.innerText=msg
+
+div.style.position="fixed"
+div.style.bottom="90px"
+div.style.right="20px"
+div.style.background="#14B8A6"
+div.style.color="white"
+div.style.padding="10px"
+div.style.borderRadius="8px"
+
+document.body.appendChild(div)
+
+setTimeout(()=>div.remove(),4000)
+
+}
+
 </script>
+
 </body>
 </html>
