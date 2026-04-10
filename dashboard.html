@@ -2,147 +2,271 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>DormKart Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DormKart - Browse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui; }
-        body { background:#E6FFFA; padding-bottom: 80px; }
-        .header { background:#14B8A6; color:white; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight:bold; font-size:20px; }
-        .hero { text-align:center; padding:20px 10px; }
-        .search { padding:0 20px; margin-bottom:15px; }
-        .search input { width:100%; padding:12px; border-radius:25px; border:1px solid #ccc; outline: none; }
-        .filters { display:flex; gap:10px; overflow:auto; padding:10px 20px; }
-        .filters button { padding:8px 15px; border:none; border-radius:20px; background:white; cursor:pointer; white-space: nowrap; }
-        .filters .active { background:#14B8A6; color:white; }
-        .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; padding:15px; }
-        .card { background:white; border-radius:12px; overflow:hidden; shadow:0 4px 10px rgba(0,0,0,0.1); cursor:pointer; display:flex; flex-direction:column; }
-        .image { height:130px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; }
-        .image img { width:100%; height:100%; object-fit:cover; }
-        .content { padding:10px; }
-        .title { font-size:14px; font-weight: 600; margin-bottom:4px; }
-        .price { color: #14B8A6; font-weight:bold; }
-        .seller { display:flex; align-items:center; gap:5px; margin-top:8px; font-size:11px; color:#666; }
-        .seller img { width:18px; height:18px; border-radius:50%; }
-        .bottom { position:fixed; bottom:0; width:100%; background:white; display:flex; justify-content:space-around; padding:10px; border-top:1px solid #eee; }
-        .bottom i { color:#888; cursor:pointer; }
-        .bottom .active i { color:#14B8A6; }
-    </style>
 </head>
 <body>
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="nav-header">
+            <div class="logo-small">
+                <span>🛒</span>
+                <h2>DormKart</h2>
+            </div>
+            <div class="nav-actions">
+                <button class="icon-btn" id="voice-search-btn" title="Voice Search">🎤</button>
+                <button class="icon-btn" id="notifications-btn">🔔</button>
+                <button class="icon-btn" id="menu-btn">☰</button>
+            </div>
+        </div>
 
-<div class="header">
-    <div class="logo">DormKart</div>
-    <div class="notification"><i class="material-icons">notifications</i></div>
-</div>
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Search for items, books, electronics...">
+                <button class="filter-btn" id="filter-toggle">⚡</button>
+            </div>
+        </div>
 
-<div class="hero">
-    <h1>Marketplace</h1>
-</div>
+        <!-- Category Pills -->
+        <div class="categories-scroll">
+            <button class="category-pill active" data-category="all">All</button>
+            <button class="category-pill" data-category="Electronics">📱 Electronics</button>
+            <button class="category-pill" data-category="Books">📚 Books</button>
+            <button class="category-pill" data-category="Stationery">✏️ Stationery</button>
+            <button class="category-pill" data-category="Gaming">🎮 Gaming</button>
+            <button class="category-pill" data-category="Hostel Essentials">🏠 Hostel</button>
+            <button class="category-pill" data-category="Fashion">👕 Fashion</button>
+            <button class="category-pill" data-category="Collection Items">🎯 Collection</button>
+        </div>
+    </nav>
 
-<div class="search">
-    <input id="searchInput" placeholder="Search products...">
-</div>
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+        <!-- Quick Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="online-users">142</span>
+                <span class="stat-label">Online</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="active-listings">1,234</span>
+                <span class="stat-label">Items</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="daily-deals">23</span>
+                <span class="stat-label">Deals</span>
+            </div>
+        </div>
 
-<div class="filters">
-    <button class="active" onclick="setCategory('All',this)">All</button>
-    <button onclick="setCategory('Books',this)">Books</button>
-    <button onclick="setCategory('Electronics',this)">Electronics</button>
-    <button onclick="setCategory('Furniture',this)">Furniture</button>
-</div>
+        <!-- Flash Deals Section -->
+        <section class="section-container">
+            <div class="section-header">
+                <h3>⚡ Flash Deals</h3>
+                <a href="#" class="see-all">See All →</a>
+            </div>
+            <div class="flash-deals-scroll" id="flash-deals-container">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
 
-<div id="productGrid" class="grid">
-    <p style="text-align:center; grid-column: 1/-1;">Loading items...</p>
-</div>
+        <!-- Trending Items -->
+        <section class="section-container">
+            <div class="section-header">
+                <h3>🔥 Trending Near You</h3>
+                <span class="trend-badge">Hot</span>
+            </div>
+            <div class="products-grid" id="trending-products">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
 
-<div class="bottom">
-    <div class="active" onclick="location.href='dashboard.html'"><i class="material-icons">home</i></div>
-    <div onclick="location.href='add-product.html'"><i class="material-icons">add_box</i></div>
-    <div onclick="location.href='chats.html'"><i class="material-icons">chat</i></div>
-    <div onclick="location.href='profile.html'"><i class="material-icons">person</i></div>
-</div>
+        <!-- Main Product Grid -->
+        <section class="section-container">
+            <div class="section-header">
+                <h3>📦 Recent Listings</h3>
+                <select id="sort-select" class="sort-select">
+                    <option value="newest">Newest</option>
+                    <option value="price_low">Price: Low to High</option>
+                    <option value="price_high">Price: High to Low</option>
+                    <option value="popular">Most Popular</option>
+                </select>
+            </div>
+            <div class="products-grid" id="products-container">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
 
-<script>
-    const supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-    let currentUser = null;
-    let currentCategory = "All";
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Finding items near you...</p>
+        </div>
+    </main>
 
-    async function init() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) { location.href = "index.html"; return; }
-        currentUser = user;
-        fetchProducts();
-    }
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="#" class="nav-item" id="reels-nav">
+            <span class="nav-icon">📱</span>
+            <span class="nav-label">Reels</span>
+        </a>
+        <button class="nav-item add-product-btn" id="add-product-fab">
+            <span class="fab-icon">+</span>
+        </button>
+        <a href="chats.html" class="nav-item">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">Chats</span>
+            <span class="badge" id="unread-badge">3</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Profile</span>
+        </a>
+    </nav>
 
-    async function fetchProducts() {
-        const grid = document.getElementById("productGrid");
-        grid.innerHTML = "Fetching...";
+    <!-- Product Modal (Hidden by default) -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close">&times;</button>
+                <div class="modal-actions">
+                    <button class="icon-btn" id="modal-share">🔗</button>
+                    <button class="icon-btn" id="modal-report">🚩</button>
+                </div>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Product details will be injected here -->
+            </div>
+        </div>
+    </div>
 
-        try {
-            // UPDATED QUERY: Looking for 'available'
-            let query = supabaseClient
-                .from("products")
-                .select(`*, users(name, avatar_url)`);
-
-            // Filter by category
-            if (currentCategory !== "All") {
-                query = query.eq("category", currentCategory);
-            }
-
-            // Filter by status (available)
-            // If some products have no status, we use .or to show 'available' OR 'null'
-            query = query.or('status.eq.available,status.is.null');
-
-            const { data, error } = await query.order('created_at', { ascending: false });
-
-            if (error) throw error;
-
-            if (!data || data.length === 0) {
-                grid.innerHTML = `<p style="grid-column:1/-1; text-align:center;">No products found with status 'available'.</p>`;
-                return;
-            }
-
-            grid.innerHTML = "";
-            data.forEach(p => {
-                const sellerName = p.users?.name || "Student";
-                const avatar = p.users?.avatar_url || `https://ui-avatars.com/api/?name=${sellerName}`;
-                
-                const card = `
-                    <div class="card" onclick="location.href='product.html?id=${p.id}'">
-                        <div class="image">
-                            ${p.image_url ? `<img src="${p.image_url}">` : `<i class="material-icons">image</i>`}
-                        </div>
-                        <div class="content">
-                            <div class="title">${p.title || 'Untitled'}</div>
-                            <div class="price">₹${p.price || '0'}</div>
-                            <div class="seller">
-                                <img src="${avatar}">
-                                <span>${sellerName}</span>
+    <!-- Add Product Modal -->
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sell an Item</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-product-form">
+                    <div class="form-group">
+                        <label>Photos</label>
+                        <div class="photo-upload-container">
+                            <div class="photo-preview" id="photo-preview">
+                                <button type="button" class="add-photo-btn">+ Add Photos</button>
                             </div>
+                            <input type="file" id="product-photos" multiple accept="image/*" style="display: none;">
                         </div>
                     </div>
-                `;
-                grid.insertAdjacentHTML("beforeend", card);
-            });
 
-        } catch (err) {
-            console.error(err);
-            grid.innerHTML = `<p style="color:red; text-align:center; grid-column:1/-1;">Error: ${err.message}</p>`;
-        }
-    }
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="product-title" placeholder="What are you selling?" required>
+                    </div>
 
-    function setCategory(cat, btn) {
-        document.querySelectorAll(".filters button").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentCategory = cat;
-        fetchProducts();
-    }
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" id="product-price" placeholder="0" required>
+                            <small id="price-suggestion" class="suggestion-text"></small>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="product-category" required>
+                                <option value="">Select</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Books">Books</option>
+                                <option value="Stationery">Stationery</option>
+                                <option value="Gaming">Gaming</option>
+                                <option value="Hostel Essentials">Hostel Essentials</option>
+                                <option value="Fashion">Fashion</option>
+                                <option value="Collection Items">Collection Items</option>
+                            </select>
+                        </div>
+                    </div>
 
-    init();
-</script>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Condition</label>
+                            <select id="product-condition" required>
+                                <option value="">Select</option>
+                                <option value="Like New">Like New</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Used">Used</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Meetup Location</label>
+                            <select id="meetup-location">
+                                <option value="">Select</option>
+                                <option value="Library">Library</option>
+                                <option value="Student Union">Student Union</option>
+                                <option value="Cafeteria">Cafeteria</option>
+                                <option value="Dorm Lobby">Dorm Lobby</option>
+                                <option value="Admin Block">Admin Block</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="product-description" rows="4" placeholder="Describe your item..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="swap-enabled">
+                            <span>Open to trade/swap</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" id="swap-item-group" style="display: none;">
+                        <label>Item wanted in exchange (optional)</label>
+                        <input type="text" id="swap-item" placeholder="What would you trade for?">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="urgent-sale">
+                            <span>🏃 Urgent Sale (Adds badge to listing)</span>
+                        </label>
+                    </div>
+
+                    <div class="safety-notice">
+                        <span>🛡️</span>
+                        <p>Safety Tip: Meet in public campus locations and verify student ID before payment.</p>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">List Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reels Modal -->
+    <div id="reels-modal" class="modal fullscreen-modal">
+        <div class="reels-container">
+            <div class="reels-header">
+                <h3>📱 Product Reels</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="reels-content" id="reels-content">
+                <!-- Vertical swipeable product cards -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
 </body>
 </html>
