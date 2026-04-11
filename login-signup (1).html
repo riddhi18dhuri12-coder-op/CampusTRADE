@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign Up | DormKart</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+
+    <style>
+        :root {
+            --pale-yellow: #ffffba;
+            --mint-green: #baffc9;
+            --sky-blue: #bae1ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-canvas: #f8faff;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            background-image: radial-gradient(circle at 0% 0%, var(--pale-yellow) 0%, transparent 20%),
+                              radial-gradient(circle at 100% 100%, var(--mint-green) 0%, transparent 20%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--sky-blue);
+            text-align: center;
+        }
+
+        .logo-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: var(--mint-green);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-left: 4px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1.5px solid #f1f5f9;
+            background: #f8fafc;
+            font-size: 15px;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--sky-blue);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(186, 225, 255, 0.3);
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: -10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .forgot-link:hover { color: var(--text-main); }
+
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: var(--sky-blue);
+            color: var(--text-main);
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            filter: brightness(0.95);
+        }
+
+        .toggle-text {
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .toggle-text span {
+            color: var(--text-main);
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .hidden { display: none; }
+
+        #statusMessage {
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="logo-area">
+            <div class="logo-icon"><span class="material-icons-round">storefront</span></div>
+            <span class="logo-text">DormKart</span>
+        </div>
+
+        <div id="loginSection">
+            <h2>Welcome Back</h2>
+            <p class="subtitle">Access the smartest campus marketplace.</p>
+            
+            <div class="form-group">
+                <label>College Email</label>
+                <input type="email" id="loginEmail" placeholder="student@college.edu">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="••••••••">
+            </div>
+
+            <span class="forgot-link" onclick="showReset()">Forgot Password?</span>
+
+            <button class="btn-auth" onclick="handleLogin()">Log In</button>
+            
+            <p class="toggle-text">New to DormKart? <span onclick="toggleAuth('signup')">Create account</span></p>
+        </div>
+
+        <div id="signupSection" class="hidden">
+            <h2>Join DormKart</h2>
+            <p class="subtitle">Start trading with your community today.</p>
+            
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="Alex Johnson">
+            </div>
+
+            <div class="form-group">
+                <label>College Email</label>
+                <input type="email" id="regEmail" placeholder="student@college.edu">
+            </div>
+            
+            <div class="form-group">
+                <label>Create Password</label>
+                <input type="password" id="regPass" placeholder="Min. 6 characters">
+            </div>
+
+            <button class="btn-auth" style="background: var(--mint-green);" onclick="handleSignup()">Sign Up</button>
+            
+            <p class="toggle-text">Have an account? <span onclick="toggleAuth('login')">Log in</span></p>
+        </div>
+
+        <div id="resetSection" class="hidden">
+            <h2>Reset Password</h2>
+            <p class="subtitle">We'll email you a link to reset your password.</p>
+            
+            <div class="form-group">
+                <label>Registered Email</label>
+                <input type="email" id="resetEmail" placeholder="student@college.edu">
+            </div>
+
+            <button class="btn-auth" style="background: var(--pale-yellow);" onclick="handleReset()">Send Reset Link</button>
+            
+            <p class="toggle-text"><span onclick="toggleAuth('login')">Back to Login</span></p>
+        </div>
+
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        const loginSec = document.getElementById('loginSection');
+        const signupSec = document.getElementById('signupSection');
+        const resetSec = document.getElementById('resetSection');
+        const statusDiv = document.getElementById('statusMessage');
+
+        function toggleAuth(view) {
+            loginSec.classList.add('hidden');
+            signupSec.classList.add('hidden');
+            resetSec.classList.add('hidden');
+            statusDiv.innerText = "";
+            statusDiv.className = "";
+
+            if(view === 'login') loginSec.classList.remove('hidden');
+            else if(view === 'signup') signupSec.classList.remove('hidden');
+        }
+
+        function showReset() {
+            loginSec.classList.add('hidden');
+            resetSec.classList.remove('hidden');
+            statusDiv.innerText = "";
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            if(!email || !pass) {
+                showMessage("Please fill in all fields.", "error");
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+
+            if (error) showMessage(error.message, "error");
+            else window.location.href = "dashboard.html";
+        }
+
+        async function handleSignup() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPass').value;
+
+            if(!name || !email || !pass) {
+                showMessage("Please fill in all fields.", "error");
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.signUp({
+                email, password: pass,
+                options: { data: { full_name: name } }
+            });
+
+            if (error) showMessage(error.message, "error");
+            else {
+                showMessage("Check your email for the verification link!", "success");
+                setTimeout(() => toggleAuth('login'), 3000);
+            }
+        }
+
+        async function handleReset() {
+            const email = document.getElementById('resetEmail').value;
+            if(!email) {
+                showMessage("Please enter your email address.", "error");
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password.html',
+            });
+
+            if (error) showMessage(error.message, "error");
+            else showMessage("Reset link sent! Please check your inbox.", "success");
+        }
+
+        function showMessage(msg, type) {
+            statusDiv.innerText = msg;
+            statusDiv.className = type;
+        }
+    </script>
+</body>
+</html>

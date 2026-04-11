@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>DormKart</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Pastel Rainbow Palette */
+            --baby-pink: #ffb3ba;
+            --mint-green: #baffc9;
+            --sky-blue: #bae1ff;
+            --text-dark: #1f2937;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* Gentle gradient for background */
+            background: linear-gradient(135deg, #f3f6ff 0%, #e8f0fe 100%);
+            color: var(--text-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Unified Splash Container */
+        .main-card {
+            text-align: center;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            width: 85%;
+            max-width: 400px;
+            animation: fadeInScale 1s ease-out forwards;
+        }
+
+        /* Branding Section */
+        .icon-box {
+            background: white;
+            padding: 20px;
+            border-radius: 28px;
+            display: inline-block;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            margin-bottom: 20px;
+            animation: pulseSoft 3s infinite ease-in-out;
+        }
+
+        .startup-icon {
+            font-size: 64px;
+            display: block;
+            background: linear-gradient(135deg, #3a86ff 0%, #8338ec 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -1.5px;
+            color: #111827;
+        }
+
+        /* Integrated Info Section */
+        .info-content {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .why-label {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #3a86ff;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .why-desc {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        /* Professional Loading Indicator */
+        .loader-wrapper {
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; background-color: var(--baby-pink); }
+        .dot:nth-child(2) { animation-delay: -0.16s; background-color: var(--mint-green); }
+        .dot:nth-child(3) { background-color: var(--sky-blue); }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Subtle Footer Brand */
+        .footer-tag {
+            position: absolute;
+            bottom: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #9ca3af;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-card">
+        <div class="icon-box">
+            <i class="material-icons startup-icon">storefront</i>
+        </div>
+
+        <h1>DormKart</h1>
+
+        <div class="info-content">
+            <span class="why-label">Why DormKart?</span>
+            <div class="why-desc">
+                Everything you need to find, share, and save on campus essentials. Connecting student communities.
+            </div>
+        </div>
+
+        <div class="loader-wrapper">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <div class="footer-tag">Marketplace for Students</div>
+
+    <script>
+        // Redirect to home.html after 5 seconds
+        setTimeout(function () {
+            window.location.href = "home.html";
+        }, 5000);
+    </script>
+
+</body>
+
+</html>
